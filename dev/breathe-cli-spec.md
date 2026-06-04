@@ -2,11 +2,16 @@
 title: 'Breathe CLI — Safety & Acceptance Tests'
 subtitle: 'Reference document for a paced-breathing terminal app'
 author: 'Marek Kowalczyk (spec by Claude, for Claude Opus 4.6)'
-date: 2026-05-30
-version: 1.8
+date: '2026-06-03'
+version: 2.0
 target_platform: 'macOS 10.14.6 (Mojave) & Windows 11'
 target_runtime: 'Python 3.7+ stdlib only'
 status: 'implementation complete — this document retains safety constraints and acceptance tests'
+
+> **Version 2.0 change:** Optional short breath hold (≤4 s) is now supported
+> via the `--hold` flag on the new `coherence` preset. All previous safety
+> rationale is preserved; the hold is a property of the preset, not a free
+> parameter. See §2 C1.
 ---
 
 ## 1. Purpose
@@ -23,14 +28,27 @@ For implementation constraints, see `../CLAUDE.md`.
 These are load-bearing design constraints, not features to be added
 later. They rule out whole categories of functionality.
 
-**C1. No breath retention.** The app must never prompt for a hold phase.
-Valid ratios are inhale:exhale only. If a user tries to pass a
-three-number ratio (e.g. `4-7-8`), the app rejects with a clear error
-referencing the safety rationale.
+**C1. Optional short breath hold.** A `--hold N` flag is supported only
+on the `coherence` preset, with N in 0–4 seconds (the `coherence` preset
+itself uses 4 s). Holds longer than 4 s cross into Valsalva territory
+and have no clinical evidence base in HFrEF. The flag is rejected:
+
+- with N > 4 (any preset),
+- when combined with a preset other than `coherence`,
+- when combined with a custom `--ratio` (hold is a property of the
+  preset, not a free parameter).
+
+The hold is rendered as a discrete `HOLD` phase between INHALE and
+EXHALE, with a single terminal-bell cue at phase entry. There is no
+hold after EXHALE — the breath cycle is IN → HOLD → EXHALE, three
+phases. No three-number `--ratio` form is supported; users wanting a
+hold must use `--preset coherence`.
 
 **C2. No rapid breathing.** The app must not allow total breath cycles
 shorter than 8 seconds (i.e. >7.5 bpm). Hyperventilation-adjacent
 patterns mobilise catecholamines — the opposite of the vagal intent.
+The total cycle includes the hold (e.g. `coherence` 4-4-4 = 12 s = 5
+bpm, well above the 8 s floor).
 
 **C3. Visible warning signs.** The safety screen (`--safety`) lists the
 specific stop-session symptoms: lightheadedness, palpitations, tingling
@@ -48,8 +66,11 @@ without having "missed" any breaths.
 
 | User input | Response |
 |------------|----------|
-| `--ratio 4-7-8` | Error: "Three-number ratios imply a breath hold. This app does not support breath retention. See `breathe --safety`." |
+| `--hold 5` | Error: "Hold must be 0–4 seconds (no clinical evidence for longer holds in HFrEF)." |
+| `--hold 2 --preset balanced` | Error: "Hold is supported only on the `coherence` preset." |
+| `--ratio 4-6 --hold 2` | Error: "Hold cannot be combined with a custom ratio. Use `--preset coherence`." |
 | `--ratio 2-2` | Error: "Total breath cycle must be ≥ 8 seconds (no rapid breathing)." |
+| `--ratio 4-7-8` | Error: "Ratio must be in the form `inhale-exhale` (e.g. `5-5` or `4-6`). To add a hold, use `--hold N` with the `coherence` preset." |
 | `--ratio foo` | Error: "Ratio must be in the form `inhale-exhale` (e.g. `5-5` or `4-6`)." |
 | `--ratio 3-7` | Error: "Exhale must not exceed twice the inhale (no clinical evidence for extreme ratios). See README.md for details." |
 | `--duration 0` | Error: "Duration must be 1–60 minutes." |
@@ -62,7 +83,7 @@ Manual tests, no framework required. Run in order.
 ### 3.1 Smoke tests
 
 1. `breathe --help` prints help and exits 0.
-2. `breathe --version` prints `breathe 1.8` and exits 0.
+2. `breathe --version` prints `breathe 2.0` and exits 0.
 3. `breathe --safety` prints the safety block and exits 0.
 4. `breathe --list-presets` prints the preset table and exits 0.
 5. `breathe -d 1` runs for ~60 seconds, renders breath animation, exits cleanly with `completed` status.
@@ -70,7 +91,7 @@ Manual tests, no framework required. Run in order.
 
 ### 3.2 Safety-rejection tests
 
-7. `breathe -r 4-7-8` exits non-zero with the three-number ratio error message.
+7. `breathe -r 4-7-8` exits non-zero with the ratio-format error (the hold is now passed via `--hold`, not a three-number ratio).
 8. `breathe -r 2-2` exits non-zero with the "cycle must be ≥ 8 seconds" error.
 9. `breathe -d 0` exits non-zero with the duration-range error.
 10. `breathe -d 120` exits non-zero with the duration-range error.
@@ -107,3 +128,19 @@ Manual tests, no framework required. Run in order.
 23. `breathe --log` prints the log file path and exits 0.
 24. Delete `~/.breathe_log.csv`, run `breathe --log`: prints path with "(no sessions logged yet)".
 25. `chmod 000 ~/.breathe_log.csv`, run `breathe -d 1`: session completes normally, stderr shows a one-line warning about logging failure. Restore permissions afterwards.
+
+### 3.8 Hold-validation tests
+
+26. `breathe --hold 5` exits non-zero with "Hold must be 0–4 seconds".
+27. `breathe --hold -1` exits non-zero with the same hold-range error.
+28. `breathe --preset balanced --hold 2` exits non-zero with "Hold is supported only on the `coherence` preset."
+29. `breathe --preset extended --hold 4` exits non-zero with the same message.
+30. `breathe -r 4-6 --hold 2` exits non-zero with "Hold cannot be combined with a custom ratio. Use `--preset coherence`."
+31. `breathe -d 1 --hold 2` (custom duration with custom hold) exits non-zero with the same message.
+
+### 3.9 Coherence preset state-machine tests
+
+32. `breathe --preset coherence` starts a 10-minute 4-4-4 session. The header shows `coherence · 4-4-4 · 10:00 ...` (counting down). The phase display cycles through `INHALE → HOLD → EXHALE → INHALE ...` in 4-second beats; the bar fills during INHALE, holds a full static bar during HOLD (no animation), and drains during EXHALE.
+33. During a coherence session, listen at each phase transition: a single terminal-bell cue is audible on entry to HOLD. There is no bell on entry to INHALE or EXHALE (those use the existing `afplay` / `winsound` cues).
+34. During a coherence session, press `space` while the phase is `HOLD`. The header shows `‖`, the bar freezes at full, and the countdown freezes. Press `space` again: the bar resets to the beginning of INHALE, the countdown snaps back to the last completed-cycle boundary, and the interrupted HOLD is not counted. (Pause from HOLD must resume to INHALE, never to HOLD — HOLD is a transient state.)
+35. `breathe --preset coherence` runs to completion in 10 minutes (50 cycles of 12 s). `~/.breathe_log.csv` gains a row with `preset=coherence`, `ratio=4-4-4`, `breaths=50`, `completion_pct=100`, `status=completed`.

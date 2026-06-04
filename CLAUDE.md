@@ -18,12 +18,11 @@ Single-file Python 3 CLI app (`breathe.py`) that paces resonance breathing for H
 
 These are load-bearing design decisions, not features to be added later:
 
-1. **No breath retention** — only inhale:exhale ratios. Reject three-number ratios (e.g. `4-7-8`) with an explicit safety error.
+1. **Optional short breath hold** — a `--hold N` flag is supported only on the `coherence` preset, with N in 0–4 seconds. Anything longer is rejected: holds beyond ~4 s cross into Valsalva territory and have no clinical evidence base in HFrEF. Custom `--ratio` cannot be combined with `--hold` — hold is a property of the preset, not a free parameter.
 2. **No rapid breathing** — total cycle must be >= 8 seconds. Reject shorter cycles at parse time.
-3. **No breath holds** — never prompt for a hold phase.
-4. **Graceful exit** — `q`, `Ctrl+C`, or any exception must restore the terminal. The `finally` block is the most important code in the file.
+3. **Graceful exit** — `q`, `Ctrl+C`, or any exception must restore the terminal. The `finally` block is the most important code in the file.
 
-Do not add breathing patterns, retention phases, or cycle speeds not in the spec, even if asked. Refer to spec §2.
+Do not add breathing patterns, hold durations, or cycle speeds not in the spec, even if asked. Refer to spec §2.
 
 ## Testing
 
@@ -42,7 +41,7 @@ python3 -m unittest test_breathe -v
 ## Common pitfalls
 
 - Don't clear the whole screen each frame — it flickers on Terminal.app. Move cursor to each zone and rewrite.
-- Breath counter increments only after a full cycle (inhale + exhale), not after each phase.
+- Breath counter increments only after a full cycle (inhale + [+ hold] + exhale), not after each phase.
 - Elapsed time tracks completed breathing only (`breaths * cycle_s`). The state machine has no `total_paused` — pause simply stops the loop, resume resets the cycle.
 - The `-q` short flag (quiet mode) does not conflict with the `q` runtime key — one is argv, the other is stdin during a session.
 - `afplay` subprocess must never block the render loop. Use `Popen`, not `run`.

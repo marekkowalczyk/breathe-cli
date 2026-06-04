@@ -96,11 +96,11 @@ breathe --ratio 4-8    # 12s cycle = 5.0 bpm, strong exhale emphasis
 
 This app is deliberately constrained. Several common breathing-app features are excluded for safety and focus:
 
-**No breath retention.** Breath holds (kumbhaka) raise intrathoracic pressure via a Valsalva-like mechanism and can trigger vasovagal syncope or arrhythmia in cardiac patients. The Bernardi protocols use continuous breathing with no hold phases. The app rejects three-number ratios like `4-7-8` with an explicit safety error.
+**No breath retention by default.** Breath holds (kumbhaka) raise intrathoracic pressure via a Valsalva-like mechanism and can trigger vasovagal syncope or arrhythmia in cardiac patients. The Bernardi protocols use continuous breathing with no hold phases, and that remains the default for `balanced`, `calm`, and `extended`. The `coherence` preset is the sole exception: a 4-second hold after INHALE, with no hold after EXHALE. The cycle is 4 in / 4 hold / 4 out = 12 s (5 bpm), and the hold is capped at 4 s — longer holds cross into Valsalva territory and have no clinical evidence base in HFrEF. The `--hold` flag is rejected on any other preset, and cannot be combined with a custom `--ratio` (the hold is a property of the preset, not a free parameter).
 
-**No rapid breathing.** Patterns faster than 7.5 bpm (cycles shorter than 8 seconds) move toward hyperventilation territory, reducing arterial CO2 and mobilising catecholamines — the opposite of the vagal intent (Russo et al. 2017). The app enforces a minimum cycle length of 8 seconds.
+**No rapid breathing.** Patterns faster than 7.5 bpm (cycles shorter than 8 seconds) move toward hyperventilation territory, reducing arterial CO2 and mobilising catecholamines — the opposite of the vagal intent (Russo et al. 2017). The app enforces a minimum total cycle of 8 seconds, including the hold phase.
 
-**No breath holds between phases.** There is no pause between inhale and exhale. The breath is continuous, matching the protocol in Bernardi et al. (1998, 2002).
+**No breath holds between phases by default.** There is no pause between inhale and exhale in the default `balanced`/`calm`/`extended` presets; the breath is continuous, matching the protocol in Bernardi et al. (1998, 2002). The `coherence` preset inserts a single hold between INHALE and EXHALE; there is no hold after EXHALE.
 
 **Immediate exit, always.** Pressing `q` or `Ctrl+C` ends the session within one frame. The terminal is always restored — cursor, colours, input mode — even if the app crashes. The `finally` block that does this is the most important code in the file.
 
@@ -137,13 +137,13 @@ breathe
 
 With no arguments, the app picks a preset based on the time of day:
 
-| Time of day  | Preset      | Duration | Ratio | BPM |
-|--------------|-------------|----------|-------|-----|
-| Before noon  | `balanced`  | 10 min   | 5s-5s | 6   |
-| 12:00–16:59  | `extended`  | 20 min   | 4s-6s | 6   |
-| 17:00+       | `calm`      | 15 min   | 4s-6s | 6   |
+| Time of day  | Preset      | Duration | Ratio   | BPM |
+|--------------|-------------|----------|---------|-----|
+| Before noon  | `balanced`  | 10 min   | 5s-5s   | 6   |
+| 12:00–16:59  | `extended`  | 20 min   | 4s-6s   | 6   |
+| 17:00+       | `calm`      | 15 min   | 4s-6s   | 6   |
 
-All presets target 6 breaths per minute. The `balanced` preset uses equal inhale/exhale (5-5) as a neutral baseline. The `calm` and `extended` presets use a longer exhale (4-6), which emphasises vagal activation during the expiratory phase. The time-of-day auto-select picks `calm` in the evening as a default — but you can use any preset at any time.
+The default three presets target 6 breaths per minute. The `balanced` preset uses equal inhale/exhale (5-5) as a neutral baseline. The `calm` and `extended` presets use a longer exhale (4-6), which emphasises vagal activation during the expiratory phase. The time-of-day auto-select picks `calm` in the evening as a default — but you can use any preset at any time. The `coherence` preset (4 in / 4 hold / 4 out, 5 bpm) is opt-in via `--preset coherence`; it is not part of the time-of-day auto-select.
 
 ### Presets
 
@@ -151,8 +151,11 @@ All presets target 6 breaths per minute. The `balanced` preset uses equal inhale
 breathe --preset balanced    # 10 min, 5s-5s
 breathe --preset calm        # 15 min, 4s-6s
 breathe --preset extended    # 20 min, 4s-6s (full Bernardi protocol dose)
+breathe --preset coherence   # 10 min, 4s-4s-4s (4 in / 4 hold / 4 out, 5 bpm)
 breathe --list-presets        # show the table
 ```
+
+The `coherence` preset is the only one that supports a hold phase. The hold is part of the preset definition (4 s); the `--hold` flag is rejected on every other preset and cannot be combined with a custom `--ratio`.
 
 ### Custom sessions
 
@@ -171,6 +174,7 @@ Duration: 1–60 minutes (rounded up to complete breath cycles). Ratio: inhale a
 | `--preset NAME`   | `-p`  | Use a named preset                         |
 | `--duration MIN`  | `-d`  | Session length in minutes (1–60)           |
 | `--ratio IN-EX`   | `-r`  | Breath ratio, e.g. `5-5` or `4-6`         |
+| `--hold SEC`      |       | Optional post-inhale hold (0–4 s, `coherence` preset only) |
 | `--no-sound`      | `-n`  | Disable audio cues                         |
 | `--quiet`         | `-q`  | Suppress startup warnings                  |
 | `--no-log`        |       | Don't log this session                     |
@@ -201,6 +205,8 @@ During a session:
 
   space pause · s mute · q quit       <- available controls
 ```
+
+On the `coherence` preset, the ratio string reads `4-4-4` (in-hold-out) and the display cycles through a `HOLD` phase between INHALE and EXHALE. During HOLD the bar is full and static (no animation); a single terminal-bell cue marks the transition.
 
 The status indicator shows `●` during breathing, `‖` when paused, and `🔇` when muted.
 
@@ -238,7 +244,7 @@ Run `breathe --safety` for the full safety screen. The short version:
 - **Palpitations** — stop, note the time, mention it at your next cardiology visit.
 - **Tingling in hands or face** — a hyperventilation signal. Stop and return to normal breathing.
 
-This app deliberately does not support breath retention, rapid breathing, or any pattern not grounded in the slow-breathing clinical literature. These constraints are enforced in the code and cannot be overridden. See [The science in brief](#the-science-in-brief) and [Design choices](#design-choices) for the clinical rationale.
+This app deliberately does not support long breath holds, rapid breathing, or any pattern not grounded in the slow-breathing clinical literature. The single exception is the `coherence` preset's 4-second post-inhale hold, which is the only opt-in retention allowed; longer holds, custom-ratio holds, and post-exhale holds are all rejected at parse time. The 8-second minimum cycle, inhale/exhale range (3–10 s), and 2:1 exhale ceiling remain in force. See [The science in brief](#the-science-in-brief) and [Design choices](#design-choices) for the clinical rationale.
 
 ## Disclaimer
 

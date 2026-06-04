@@ -18,17 +18,19 @@ if os.name != 'nt':
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.9'
+VERSION = '2.0'
 
 PRESETS = {
-    'balanced': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
-    'calm': {'duration_min': 15, 'inhale_s': 4, 'exhale_s': 6},
-    'extended':    {'duration_min': 20, 'inhale_s': 4, 'exhale_s': 6},
+    'balanced': {'duration_min': 10, 'inhale_s': 5, 'hold_s': 0, 'exhale_s': 5},
+    'calm':     {'duration_min': 15, 'inhale_s': 4, 'hold_s': 0, 'exhale_s': 6},
+    'extended': {'duration_min': 20, 'inhale_s': 4, 'hold_s': 0, 'exhale_s': 6},
+    'coherence': {'duration_min': 10, 'inhale_s': 4, 'hold_s': 4, 'exhale_s': 4},
 }
 
 PRESET_DESCRIPTIONS = {'balanced': 'Equal ratio, neutral baseline',
                        'calm': 'Exhale-weighted, parasympathetic emphasis',
-                       'extended': 'Full dose, Bernardi protocol'}
+                       'extended': 'Full dose, Bernardi protocol',
+                       'coherence': 'Box-style with short post-inhale hold'}
 
 SOUND_INHALE = '/System/Library/Sounds/Tink.aiff'
 SOUND_EXHALE = '/System/Library/Sounds/Pop.aiff'
@@ -49,6 +51,7 @@ FRAME_SLEEP    = 1.0 / FRAME_RATE_HZ
 COUNTDOWN_SECS = 3
 MIN_TERM_WIDTH = 40
 MIN_CYCLE_SECS = 8
+MAX_HOLD_SECS  = 4
 
 ANSI_CLEAR    = '\033[2J\033[H'
 ANSI_HIDE_CUR = '\033[?25l'
@@ -57,10 +60,13 @@ ANSI_RESET    = '\033[0m'
 ANSI_DIM      = '\033[2m'
 ANSI_CYAN     = '\033[36m'
 ANSI_GREEN    = '\033[32m'
+ANSI_YELLOW   = '\033[33m'
 ANSI_CLR_LINE = '\033[K'
 
-INHALE, EXHALE, PAUSED = 'INHALE', 'EXHALE', 'PAUSED'
-PHASE_LABEL = {INHALE: 'IN', EXHALE: 'OUT'}
+INHALE, HOLD, EXHALE, PAUSED = 'INHALE', 'HOLD', 'EXHALE', 'PAUSED'
+PHASE_LABEL = {INHALE: 'IN', HOLD: 'HOLD', EXHALE: 'OUT'}
+PHASE_DUR = {INHALE: 'inhale_s', HOLD: 'hold_s', EXHALE: 'exhale_s'}
+PHASE_COLOUR = {INHALE: ANSI_CYAN, HOLD: ANSI_YELLOW, EXHALE: ANSI_GREEN}
 
 SAFETY_TEXT = """\
 Breathe CLI \u2014 safety notes
@@ -79,9 +85,15 @@ STOP THE SESSION IMMEDIATELY if you experience:
     return to normal breathing.
 
 This app deliberately does NOT support:
-  \u2022 Breath retention (kumbhaka) of any length
   \u2022 Rapid breathing (kapalbhati, bhastrika, Wim Hof patterns)
   \u2022 Total breath cycles shorter than 8 seconds
+  \u2022 Breath holds longer than 4 seconds
+  \u2022 Breath holds on presets other than `coherence`
+
+The `coherence` preset is the only exception: a 4-second post-inhale
+hold (no hold after exhale). Use `--preset coherence` to access it.
+The `--hold` flag is rejected on every other preset and cannot be
+combined with a custom `--ratio`.
 
 Press q or Ctrl+C to end any session. Exit is always immediate.
 
@@ -97,13 +109,16 @@ For the clinical evidence behind these constraints, see README.md."""
 class Config:
     duration_s: int
     inhale_s: int
+    hold_s: int
     exhale_s: int
-    preset_name: str       # 'balanced', 'calm', 'extended', or 'custom'
+    preset_name: str       # 'balanced', 'calm', 'extended', 'coherence', or 'custom'
     sound_enabled: bool
     quiet: bool
 
     @property
     def ratio_str(self):
+        if self.hold_s > 0:
+            return '{}-{}-{}'.format(self.inhale_s, self.hold_s, self.exhale_s)
         return '{}-{}'.format(self.inhale_s, self.exhale_s)
 
 @dataclass
@@ -199,6 +214,10 @@ def check_audio(quiet):
     return 'bell'
 
 def play_sound(phase, audio_mode):
+    if phase == HOLD:
+        sys.stdout.write('\a')
+        sys.stdout.flush()
+        return
     if audio_mode == 'winsound':
         try:
             import winsound
@@ -297,7 +316,7 @@ def draw_phase(layout, phase):
     sys.stdout.write(ANSI_CLR_LINE)
     label = PHASE_LABEL.get(phase, phase)
     if layout.use_colour:
-        colour = ANSI_CYAN if phase == INHALE else ANSI_GREEN
+        colour = PHASE_COLOUR.get(phase, ANSI_RESET)
         styled = colour + label + ANSI_RESET
     else:
         styled = label
@@ -312,6 +331,8 @@ def draw_bar(layout, progress, phase):
     sys.stdout.write(ANSI_CLR_LINE)
     if phase == INHALE:
         filled = round(progress * BAR_WIDTH)
+    elif phase == HOLD:
+        filled = BAR_WIDTH
     else:
         filled = round((1.0 - progress) * BAR_WIDTH)
     filled = max(0, min(BAR_WIDTH, filled))
@@ -329,7 +350,7 @@ def draw_bar(layout, progress, phase):
 def draw_progress(layout, config, elapsed):
     move_to(layout.progress_row, 1)
     sys.stdout.write(ANSI_CLR_LINE)
-    cycle_s = config.inhale_s + config.exhale_s
+    cycle_s = config.inhale_s + config.hold_s + config.exhale_s
     frac = min(1.0, elapsed / config.duration_s) if config.duration_s > 0 else 1.0
     filled = round(frac * BAR_WIDTH)
     filled = max(0, min(BAR_WIDTH, filled))
@@ -405,7 +426,7 @@ def run_session(config, result):
         if not config.quiet:
             sys.stderr.write('Warning: not a TTY, running without animation.\n')
         start = time.monotonic()
-        cycle_s = config.inhale_s + config.exhale_s
+        cycle_s = config.inhale_s + config.hold_s + config.exhale_s
         try:
             time.sleep(config.duration_s)
             result.completed = True
@@ -436,7 +457,7 @@ def run_session(config, result):
             result.aborted = True
             return
 
-        cycle_s = config.inhale_s + config.exhale_s
+        cycle_s = config.inhale_s + config.hold_s + config.exhale_s
         state = INHALE
         phase_start_wall = time.monotonic()
         breathing_base = 0.0
@@ -477,13 +498,12 @@ def run_session(config, result):
                     continue
                 # Resume: fall through to active code
 
-            # ── INHALE / EXHALE ─────────────────────────────
+            # ── INHALE / HOLD / EXHALE ───────────────────────
             if _abort[0]:
                 result.aborted = True
                 break
 
-            phase_dur = (config.inhale_s if state == INHALE
-                         else config.exhale_s)
+            phase_dur = getattr(config, PHASE_DUR[state])
             phase_elapsed = now - phase_start_wall
             progress = phase_elapsed / phase_dur
 
@@ -491,6 +511,16 @@ def run_session(config, result):
             if progress >= 1.0:
                 if state == INHALE:
                     phase_start_wall += config.inhale_s
+                    if config.hold_s > 0:
+                        state = HOLD
+                        if not muted and audio_mode != 'none':
+                            play_sound(HOLD, audio_mode)
+                    else:
+                        state = EXHALE
+                        if not muted and audio_mode != 'none':
+                            play_sound(EXHALE, audio_mode)
+                elif state == HOLD:
+                    phase_start_wall += config.hold_s
                     state = EXHALE
                     if not muted and audio_mode != 'none':
                         play_sound(EXHALE, audio_mode)
@@ -510,8 +540,7 @@ def run_session(config, result):
                 # Recalculate for the new phase so the render below
                 # shows the correct label and bar on the same frame
                 # the sound fires (no stale-frame flicker).
-                phase_dur = (config.inhale_s if state == INHALE
-                             else config.exhale_s)
+                phase_dur = getattr(config, PHASE_DUR[state])
                 phase_elapsed = now - phase_start_wall
                 progress = phase_elapsed / phase_dur
 
@@ -522,11 +551,17 @@ def run_session(config, result):
                 elapsed_display = breathing_base + phase_elapsed
                 remaining_s = (config.duration_s - breathing_base
                                - clean_phase_s)
-            else:
+            elif state == HOLD:
                 elapsed_display = (breathing_base + config.inhale_s
                                    + phase_elapsed)
                 remaining_s = (config.duration_s - breathing_base
                                - config.inhale_s - clean_phase_s)
+            else:
+                elapsed_display = (breathing_base + config.inhale_s
+                                   + config.hold_s + phase_elapsed)
+                remaining_s = (config.duration_s - breathing_base
+                               - config.inhale_s - config.hold_s
+                               - clean_phase_s)
 
             key = poll_key()
             if key == 'q':
@@ -611,11 +646,17 @@ def print_safety():
 def print_presets():
     print('Available presets:\n')
     fmt = '  {:<10} {:>8}   {:<20} {}'
-    print(fmt.format('Name', 'Duration', 'Ratio (in-ex)', 'Target use'))
+    print(fmt.format('Name', 'Duration', 'Ratio (in-hold-ex)', 'Target use'))
     print(fmt.format('\u2500' * 10, '\u2500' * 8, '\u2500' * 20, '\u2500' * 24))
     for name, p in PRESETS.items():
-        bpm = 60.0 / (p['inhale_s'] + p['exhale_s'])
-        ratio = '{}s-{}s ({:.0f} bpm)'.format(p['inhale_s'], p['exhale_s'], bpm)
+        cycle_s = p['inhale_s'] + p['hold_s'] + p['exhale_s']
+        bpm = 60.0 / cycle_s
+        if p['hold_s'] > 0:
+            ratio = '{}-{}-{} ({:.0f} bpm)'.format(
+                p['inhale_s'], p['hold_s'], p['exhale_s'], bpm)
+        else:
+            ratio = '{}-{} ({:.0f} bpm)'.format(
+                p['inhale_s'], p['exhale_s'], bpm)
         print(fmt.format(name, '{} min'.format(p['duration_min']),
                          ratio, PRESET_DESCRIPTIONS[name]))
 
@@ -624,11 +665,10 @@ def _die(msg):
     sys.exit(1)
 
 def parse_ratio(ratio_str):
-    _fmt_err = 'Ratio must be in the form `inhale-exhale` (e.g. `5-5` or `4-6`).'
+    _fmt_err = ('Ratio must be in the form `inhale-exhale` (e.g. `5-5` or '
+                '`4-6`). To add a hold, use `--hold N` with the `coherence` '
+                'preset.')
     parts = ratio_str.split('-')
-    if len(parts) > 2:
-        _die('Three-number ratios imply a breath hold. '
-             'This app does not support breath retention. See `breathe --safety`.')
     if len(parts) != 2:
         _die(_fmt_err)
     try:
@@ -659,11 +699,14 @@ def build_parser():
     parser.add_argument('--list-presets', action='store_true',
                         help='Show available presets and exit')
     parser.add_argument('--preset', '-p', choices=list(PRESETS.keys()),
-                        help='Use a named preset (balanced, calm, extended)')
+                        help='Use a named preset (balanced, calm, extended, coherence)')
     parser.add_argument('--duration', '-d', type=int, metavar='MINUTES',
                         help='Session duration in minutes (1\u201360, default: 10)')
     parser.add_argument('--ratio', '-r', metavar='IN-EX',
                         help='Breath ratio as inhale-exhale (e.g. 5-5 or 4-6)')
+    parser.add_argument('--hold', type=int, metavar='SECS',
+                        help='Optional post-inhale hold in seconds (0\u20134, '
+                             'coherence preset only)')
     parser.add_argument('--no-sound', '-n', action='store_true',
                         help='Disable audio cues')
     parser.add_argument('--quiet', '-q', action='store_true',
@@ -707,11 +750,13 @@ def main():
         sys.exit(0)
 
     # Build config from args
+    hold_s = 0
     if args.preset:
         if args.duration is not None or args.ratio is not None:
             _die('--preset cannot be combined with --duration or --ratio.')
         p = PRESETS[args.preset]
         inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
+        hold_s = p['hold_s']
         duration_min = p['duration_min']
         preset_name = args.preset
     elif args.duration is not None or args.ratio is not None:
@@ -733,19 +778,32 @@ def main():
             preset_name = 'calm'
         p = PRESETS[preset_name]
         inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
+        hold_s = p['hold_s']
         duration_min = p['duration_min']
+
+    if args.hold is not None:
+        if not (0 <= args.hold <= MAX_HOLD_SECS):
+            _die('Hold must be 0\u2013{} seconds (no clinical evidence for '
+                 'longer holds in HFrEF).'.format(MAX_HOLD_SECS))
+        if args.ratio is not None:
+            _die('Hold cannot be combined with a custom ratio. '
+                 'Use `--preset coherence`.')
+        if args.preset != 'coherence':
+            _die('Hold is supported only on the `coherence` preset.')
+        hold_s = args.hold
 
     if not (1 <= duration_min <= 60):
         _die('Duration must be 1\u201360 minutes.')
 
     # Round duration up to a whole number of breath cycles so that
     # the countdown, progress bar, and session end are all in sync.
-    cycle_s = inhale_s + exhale_s
+    cycle_s = inhale_s + hold_s + exhale_s
     duration_s = -(-duration_min * 60 // cycle_s) * cycle_s
 
     config = Config(
         duration_s=duration_s,
         inhale_s=inhale_s,
+        hold_s=hold_s,
         exhale_s=exhale_s,
         preset_name=preset_name,
         sound_enabled=not args.no_sound,
