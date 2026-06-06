@@ -2,6 +2,21 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-06-06 — GitHub metrics tooling and repo stats snapshot
+
+**What went well:**
+- User-driven iterative design produced a cleaner architecture than the first draft — separating deterministic script from LLM skill was the user's insight, not mine
+- Parallel execution of GitHub API calls and file reads kept the session fast
+- Cross-repo awareness worked smoothly — dropped the publication ideas note into system/owner-inbox for processing by a different Claude Code instance
+
+**What didn't go well:**
+- First attempt at `gh` commands failed due to shell path issues (`/usr/local/bin/gh` needed explicit path). Lost a round-trip debugging this
+- Wrote the skill and script in the wrong locations twice (user rejected writes to `~/.claude/commands/` and `~/repos/system/bin/`) before understanding that user wanted drafts in `dev/` for inspection first
+
+**What we'll do differently:**
+- When creating tools/skills for the first time, always draft to the working directory for user inspection before installing to final locations
+- When shell tools fail with cryptic errors, check the full path first — `gh` on this system needs `/usr/local/bin/gh`
+
 ## 2026-05-15 — Add session logging and TODO items
 
 **What went well:**
