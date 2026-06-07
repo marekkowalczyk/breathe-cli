@@ -56,9 +56,9 @@ file needed, consistent with the no-config-files constraint).
 - `--preset` + `--ratio`: already rejected; no change.
 
 **Line budget:** ~30–40 lines for the env var read, validation,
-ratio computation, and preset adjustment. Current file is 694
-lines (cap 700). Requires a line-trimming pass first, or raising
-the cap.
+ratio computation, and preset adjustment. Current file is ~780
+lines. Python v1 is feature-frozen (see #14 version plan); this
+feature would land in Go v2 if pursued.
 
 **Caveats:**
 - Integer-only phase durations mean not every BPM maps cleanly.

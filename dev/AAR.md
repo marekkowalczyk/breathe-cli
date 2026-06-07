@@ -2,6 +2,22 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-06-07 — DSL design session: spec, version plan, Go rewrite strategy
+
+**What went well:**
+- Conversational design process was highly effective — "restate for clarity" twice before writing anything prevented false starts and ensured shared understanding of the feature
+- Every decision landed in a file within minutes — DSL spec, version plan, TODO, README, CLAUDE.md all stayed in sync throughout
+- The Go rewrite insight emerged organically from examining the line cap constraint — following the constraint to its logical conclusion rather than patching around it
+- Doc hygiene was strong — caught cross-reference gaps (README missing version plan link, CLAUDE.md missing file layout entries) in real time, not at close
+- Publication ideas file was written with full context for a future session that won't have access to this conversation
+
+**What didn't go well:**
+- Nothing significant — the session was all design and documentation, no implementation risk
+
+**What we'll do differently:**
+- Use branches and PRs for DSL implementation work instead of pushing to master (saved to memory)
+- When starting Go v2.0, ensure the Python acceptance tests (spec §3, 25 tests) are documented well enough to validate the Go port independently
+
 ## 2026-06-06 — GitHub metrics tooling and repo stats snapshot
 
 **What went well:**

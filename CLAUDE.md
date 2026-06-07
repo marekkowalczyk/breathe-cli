@@ -23,7 +23,7 @@ These are load-bearing design decisions, not features to be added later:
 3. **No breath holds** — never prompt for a hold phase.
 4. **Graceful exit** — `q`, `Ctrl+C`, or any exception must restore the terminal. The `finally` block is the most important code in the file.
 
-Do not add breathing patterns, retention phases, or cycle speeds not in the spec, even if asked. Refer to spec §2.
+Do not add breathing patterns, retention phases, or cycle speeds not in the spec, even if asked. Refer to spec §2. (Note: the DSL spec in `dev/breathing-dsl-spec.md` designs hold phases for the Go v2 rewrite. These constraints remain in force for the Python v1 codebase.)
 
 ## Testing
 
@@ -51,7 +51,7 @@ python3 -m unittest test_breathe -v
 ## File layout
 
 ```
-breathe.py            # the app (single file, under 700 lines)
+breathe.py            # the app (single file, ~780 lines)
 test_breathe.py       # automated tests (stdlib unittest)
 README.md             # project readme
 social-card.png       # GitHub/Open Graph social preview (1200×630)
