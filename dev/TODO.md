@@ -68,6 +68,13 @@ the cap.
   recommend testing at rates the app can actually represent
   (whole-second ratios), not arbitrary decimal BPMs.
 
+### 16. HN Show thread update: universal breathing patterns
+Post an update to the [Show HN thread](https://news.ycombinator.com/item?id=48340315)
+announcing universal breathing pattern support and the DSL.
+**Blocked by:** #14 (DSL implementation) — need working code users
+can actually try, not just a spec. Post when `--pattern` ships in
+a release.
+
 ## Done
 
 ### ~~13. Countdown hits 00:00 one exhale-phase early~~ FIXED (v1.7)
