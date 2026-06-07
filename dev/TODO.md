@@ -23,6 +23,13 @@ selection, per-mode presets, per-mode guardrails, and updated
 safety messaging. The single-file constraint may become the
 binding limit.
 
+**Status: scoping.** A domain-specific language (DSL) for specifying
+arbitrary breathing patterns is being designed. Four-phase model
+(`I-H1-E-H2`), phase modifiers (airway, depth), chaining, named
+presets, and two-layer validation (syntax + safety). See
+[`dev/breathing-dsl-spec.md`](breathing-dsl-spec.md) for the full
+draft specification.
+
 ### 15. Personal resonance frequency (`BREATHE_BPM`)
 Allow the user to declare their individual resonance frequency so
 that presets auto-adjust. Preferred mechanism: env var
