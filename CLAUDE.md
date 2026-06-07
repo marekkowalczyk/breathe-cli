@@ -63,6 +63,7 @@ _config.yml           # GitHub Pages / Jekyll config
 google42e5de7281e23ce0.html  # Google Search Console verification
 dev/
   breathe-cli-spec.md # safety constraints and acceptance tests
+  breathing-dsl-spec.md # universal breathing pattern DSL (draft, scoping)
   TODO.md             # bugs and enhancements tracker
   AAR.md              # after action reviews
   NEXT-SESSION.md     # session continuity notes
