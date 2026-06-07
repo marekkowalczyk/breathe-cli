@@ -2,6 +2,19 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-06-08 — Feature idea backlog and metrics snapshot
+
+**What went well:**
+- Efficient idea capture — 7 TODO items (#17–23) written up quickly with clear scoping and status markers
+- Used live GitHub data to answer the roadmap-voting question with evidence rather than opinion
+- Restating vague ideas before writing them up prevented ambiguity in the TODO entries
+
+**What didn't go well:**
+- Queried wrong repo name (`breathe` vs `breathe-cli`) before checking the remote — wasted API calls on a known issue
+
+**What we'll do differently:**
+- Check `git remote -v` first when fetching GitHub stats — don't assume repo name matches directory name
+
 ## 2026-06-07 — DSL design session: spec, version plan, Go rewrite strategy
 
 **What went well:**
