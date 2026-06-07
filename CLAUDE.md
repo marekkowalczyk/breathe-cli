@@ -8,7 +8,7 @@ Single-file Python 3 CLI app (`breathe.py`) that paces resonance breathing for H
 
 ## Key constraints
 
-- **One file**: `breathe.py`, under 500 lines (hard cap 700). No modules, no packages, no config files.
+- **One file**: `breathe.py`. No modules, no packages, no config files. The line cap exists to preserve the core value of a single-file app: one person can read and understand the entire program in one sitting. The file is currently ~780 lines. The DSL feature (TODO #14) will add significantly more. The cap will need to be revisited — either raised with a new target, or replaced by a different complexity constraint (e.g. max cyclomatic complexity, or splitting into a second file). Decision pending before v2.0.
 - **Stdlib only**: Python 3.7+. No pip installs. No third-party imports.
 - **macOS & Windows 11**: Uses `/usr/bin/afplay` on macOS and `winsound` on Windows for audio.
 - **No curses**: Use direct ANSI escape codes. curses has Mojave edge cases with non-default terminals.
