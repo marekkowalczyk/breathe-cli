@@ -1,20 +1,27 @@
 # Next Session
 
-v1.9 shipped (GitHub release + PyPI). Added Windows 11 support (community PR #3) and updated pyproject.toml classifiers. Currently 700 lines (at the hard cap).
+Python v1.9 is feature-frozen (bugfixes only). Go v2 is the next major work.
 
-Writing files (blog post, LinkedIn draft, Medium draft, PUBLISH.taskpaper) moved to `~/repos/writing`.
+## Carried over
 
-## Open items
+- **Windows test coverage** — `test_breathe.py` has no tests for Windows-specific code paths. Low priority.
+- **TODO #8 (cycle progress bar), #15 (BREATHE_BPM)** — both deferred to Go v2 if pursued.
 
-- **Windows test coverage** — `test_breathe.py` has no tests for Windows-specific code paths (winsound selection, msvcrt key polling, console setup). Low priority since these are platform-gated and hard to test on macOS.
-- ~~**Triage HN feature requests**~~ — done. Breath holds/4-7-8 (TODO #14) fully scoped: DSL spec, version plan, safety architecture designed. Biofeedback and pomodoro remain out of scope.
-- **Session progress bar — cycle count** (TODO #8), **Personal resonance frequency** (TODO #15) — both need line trimming first; file is at 777 lines.
+## Completed last session (2026-06-07)
 
-## 2026-06-07 session outcomes
+- [x] ~~Triage HN feature requests~~ — #14 fully scoped
+- [x] ~~DSL spec~~ — `dev/breathing-dsl-spec.md` written: four-phase model, EBNF grammar, modifiers, chaining, presets, two-layer validation
+- [x] ~~Version plan~~ — `dev/breathing-dsl-versions.md`: v2.0–v2.7 with Go rewrite strategy
+- [x] ~~Line cap decision~~ — resolved: freeze Python v1, rewrite in Go v2
+- [x] ~~README roadmap section~~ — links to spec and version plan
+- [x] ~~TODO #16~~ — HN update item added, blocked by #14
+- [x] ~~Publication ideas~~ — written to `~/repos/system/owner-inbox/2026-06-07-breathe-dsl-design-session-publication-ideas.md`
 
-- **DSL spec written** — `dev/breathing-dsl-spec.md`: four-phase model (`I-H1-E-H2`), formal EBNF grammar, phase modifiers (airway, depth), chaining, named presets, two-layer validation (syntax + safety). Duration-vs-count precedence resolved (conflict is an error, §5.1).
-- **Version plan written** — `dev/breathing-dsl-versions.md`: v2.0 (internal four-phase model) through v2.6 (modifiers), with dependency graph and open decisions.
-- **README roadmap section added** — links to spec and version plan, invites issues.
-- **TODO #16 added** — HN Show thread update, blocked by #14 implementation.
-- ~~**Line cap decision needed**~~ — resolved: freeze Python at v1.x (bugfixes only), rewrite in Go for v2. Single binary eliminates the line cap and single-file constraints. See `dev/breathing-dsl-versions.md` for the full strategy.
-- **Branch/PR workflow** — agreed to use branches and PRs for DSL implementation instead of pushing to master.
+## New — next steps for Go v2
+
+- **Decision: Go experience level** — open question #1 in version plan. Affects timeline.
+- **Start v2.0: Go scaffold + Python v1 feature parity** — set up Go module, port state machine, TUI, audio, CLI flags, safety checks, logging, tests. This is the foundation. Use branches and PRs (not push-to-master).
+- **Validate against Python acceptance tests** — all 25 manual tests from spec §3 must pass the Go binary before moving to v2.1+.
+- **Repo layout transition** — move Python files to `v1-python/`, set up Go project at root. Same repo, keep stars and history.
+- **Open decisions before v2.3** — mode flag vs. implicit mode, hold TUI design, audio cues for holds. See version plan.
+- **Linux support** — Go makes it trivial. Audio is the main question (PulseAudio? ALSA? No sound by default?).
