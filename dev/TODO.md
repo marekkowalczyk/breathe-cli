@@ -75,6 +75,64 @@ announcing universal breathing pattern support and the DSL.
 can actually try, not just a spec. Post when `--pattern` ships in
 a release.
 
+### 17. Anxiety breathing protocol
+Research breathing patterns used for acute anxiety relief.
+Determine how they differ from vagal-tone training (likely shorter
+exhale-dominant cycles, possibly with holds). Decide whether this
+fits as a preset within the current safety model or requires #14's
+per-mode guardrails. **Status: idea, needs research.**
+
+### 18. Visual regression testing via screenshots
+Investigate approaches where the user captures terminal screenshots
+during manual testing and compares them against reference images.
+Goal: catch TUI layout regressions without fragile ANSI-parsing
+scripts. Research: tools for terminal screenshot capture, image-diff
+libraries, workflow integration. **Status: idea, needs research.**
+
+### 19. Session log analysis and visualisation
+Explore what can be built on top of the JSON session logs: trends
+over time, streak tracking, average session length, charts.
+Could be a separate script/tool or a `--stats` flag. Decide scope
+and whether it belongs in the single-file app or a companion tool.
+**Status: idea, needs research.**
+
+### 20. Prevent screensaver / logout during session
+On macOS, long sessions may trigger screensaver or display sleep.
+Investigate `caffeinate` integration (spawn alongside session,
+kill on exit). On Windows, equivalent via `SetThreadExecutionState`.
+Must not outlive the breathing session — tie lifetime to the
+`finally` block. **Status: idea, needs research.**
+
+### 21. Brown noise audio cues with volume envelope
+Replace (or complement) click/pop cues with continuous brown noise
+shaped by volume: ramp up during inhale, hold level at peak, ramp
+down during exhale, hold silence at bottom. The volume envelope
+*is* the breathing guide — no visual required (eyes-closed use).
+Optionally layer binaural beats (e.g. alpha-range ~10 Hz offset
+between L/R channels) for additional relaxation effect. Research:
+real-time audio synthesis in Go, volume ramping, binaural beat
+generation, latency constraints. **Status: idea, needs research.**
+
+### 23. Public roadmap with user voting
+Consider publishing the roadmap on a public voting/feedback app
+(e.g. Canny, Fider, GitHub Discussions, or similar) so users can
+suggest features and vote on priorities. Seen on other open-source
+projects at similar scale. As of 2026-06-08: 275 stars, 11 forks,
+5 community issues (Linux sound), 1 external PR — real engagement
+exists but volume is low enough that GitHub Issues still works.
+Revisit at ~500 stars or when issue volume makes prioritisation
+hard. **Status: idea, not yet.**
+
+### 22. Embedded audio — no system dependencies
+Current Python version shells out to `afplay` (macOS) / `winsound`
+(Windows). For Go v2: embed sound samples (click, pop, tones)
+directly in the binary and use Go's audio capabilities to play
+them without relying on any OS-specific audio tools. Goal:
+identical audio behaviour on macOS, Windows, and Linux from a
+single static binary. Research: Go audio libraries (e.g. Oto,
+Beep), WAV embedding via `embed` package, cross-platform
+playback, latency. **Status: idea, needs research.**
+
 ## Done
 
 ### ~~13. Countdown hits 00:00 one exhale-phase early~~ FIXED (v1.7)

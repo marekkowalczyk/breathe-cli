@@ -2,6 +2,19 @@
 
 Periodic snapshots of repo traction. Newest first.
 
+## 2026-06-08
+
+| Metric | Value |
+|---|---|
+| Stars | 275 |
+| Forks | 11 |
+| Open issues | 5 |
+| Open PRs | 1 |
+| Views (14d) | 6,689 (5,266 unique) |
+| Clones (14d) | 670 (391 unique) |
+
+**Notes:** +7 stars since Jun 6. Traffic still strong: ~5k unique visitors in 14 days. Community issues all around Linux sound support; 1 external PR (coherence preset). Growth slowing from HN spike but sustained.
+
 ## 2026-06-06
 
 | Metric | Value |
