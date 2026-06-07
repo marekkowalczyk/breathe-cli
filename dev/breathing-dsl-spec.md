@@ -127,12 +127,31 @@ This means: 5 cycles of 4-0-6-0, then 10 cycles of 5-0-10-0.
 The pacer displays a transition cue between segments (details TBD — visual
 indicator, optional audio cue, brief pause).
 
-### 5.1 Open questions on chaining
+### 5.1 Duration vs. count precedence
+
+Session length can be specified two ways: `--duration` (minutes) and
+repetition counts in the pattern (`10(4-0-6-0)`). These can conflict.
+
+**Resolution: conflict is an error.** Consistent with the app's existing
+"reject, don't guess" philosophy (e.g. `--preset` + `--ratio` is already
+rejected rather than silently picking one).
+
+| Input | Behaviour |
+|-------|-----------|
+| `--pattern "4-7-8-0" --duration 10` | Duration governs (bare pattern, no count). |
+| `--pattern "10(4-7-8-0)"` | Count governs (10 cycles, no duration limit). |
+| `--pattern "10(4-7-8-0)" --duration 5` | **Error:** "10 cycles of 4-7-8-0 = 3:10, but --duration is 5:00. Use one or the other." |
+| `--pattern "5(4-0-6-0)+10(5-0-10-0)"` | Chain counts govern (5 + 10 cycles). |
+| `--pattern "5(4-0-6-0)+10(5-0-10-0)" --duration 20` | **Error:** conflict between chain counts and explicit duration. |
+
+The rule: if any segment in the pattern has an explicit count, `--duration`
+must not be specified. If no segment has a count, `--duration` is required
+(or the session runs indefinitely until the user quits).
+
+### 5.2 Open questions on chaining
 
 - Is there a maximum number of segments?
 - Can segments have different modifier defaults?
-- How does total session duration interact with per-segment counts?
-  (e.g., `--duration 5` with a chain that totals 8 minutes)
 
 ## 6. Named presets
 
@@ -264,8 +283,7 @@ enforce or display differently. Better as preset description text.
    color? A static bar? "HOLD" text?
 4. **Audio cues** — different tones for hold vs. inhale/exhale transitions?
 5. **Chain transitions** — pause between segments? Visual cue? How long?
-6. **Duration vs. count precedence** — if `--duration 5` is set but the
-   chain totals 8 minutes, which wins?
+6. ~~**Duration vs. count precedence**~~ — resolved in §5.1: conflict is an error.
 7. **Preset extensibility** — can users define custom presets? Or are
    presets hardcoded?
 8. **Backwards compatibility** — can the existing `--ratio` flag coexist

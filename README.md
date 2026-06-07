@@ -246,7 +246,7 @@ This app is not a medical device. It does not diagnose, treat, cure, or prevent 
 
 ## Roadmap
 
-**Universal breathing patterns** — The app currently supports inhale-exhale only (no holds), by design. We're scoping a DSL for arbitrary four-phase patterns (`inhale-hold-exhale-hold`) that would enable box breathing, 4-7-8 relaxation, and other research-backed protocols while keeping the current cardiac-safe mode and its safety constraints intact. See [`dev/breathing-dsl-spec.md`](dev/breathing-dsl-spec.md) for the draft spec — feedback welcome via [issues](https://github.com/marekkowalczyk/breathe/issues).
+**Universal breathing patterns** — The app currently supports inhale-exhale only (no holds), by design. We're scoping a DSL for arbitrary four-phase patterns (`inhale-hold-exhale-hold`) that would enable box breathing, 4-7-8 relaxation, and other research-backed protocols while keeping the current cardiac-safe mode and its safety constraints intact. See [`dev/breathing-dsl-spec.md`](dev/breathing-dsl-spec.md) for the draft spec and [`dev/breathing-dsl-versions.md`](dev/breathing-dsl-versions.md) for the version plan — feedback welcome via [issues](https://github.com/marekkowalczyk/breathe/issues).
 
 ## License
 
