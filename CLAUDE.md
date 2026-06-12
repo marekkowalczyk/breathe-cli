@@ -65,6 +65,7 @@ dev/
   breathe-cli-spec.md # safety constraints and acceptance tests
   breathing-dsl-spec.md    # universal breathing pattern DSL (draft, scoping)
   breathing-dsl-versions.md # version plan for DSL implementation
+  domain-model.md           # DDD fact map: ubiquitous language, value objects, entities, events, invariants
   TODO.md             # bugs and enhancements tracker
   AAR.md              # after action reviews
   NEXT-SESSION.md     # session continuity notes

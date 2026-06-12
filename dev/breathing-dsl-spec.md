@@ -1,7 +1,8 @@
 # Breathing Pattern DSL — Feature Specification
 
 **Status:** Draft — conversational design, not yet approved for implementation
-**Date:** 2026-06-07
+**Date:** 2026-06-07  
+**Domain model:** [`domain-model.md`](domain-model.md) — DDD fact map; types and invariants defined there take precedence over informal descriptions in this spec
 
 ## 1. Motivation
 
