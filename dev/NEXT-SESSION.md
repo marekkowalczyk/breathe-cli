@@ -13,6 +13,8 @@ Python v1.9 is feature-frozen (bugfixes only). Go v2 is the next major work.
 
 - [x] ~~DDD domain model~~ — `dev/domain-model.md`: ubiquitous language, value objects, single entity (SessionState), domain events, invariants, causalities, separation of concerns, Go v2 adoption note, language/architecture analysis
 - [x] ~~`--mode` open question resolved~~ — `SafetyMode` is a `validate()` parameter at config time, not a runtime flag; `cardiac` preset carries its `SafetyConstraints`
+- [x] ~~GitHub stats snapshot~~ — 302 stars, crossed 300; top ~0.01% of all public repos; above 99th percentile of Show HN projects
+- [x] ~~Coverage tracking~~ — `dev/coverage.md` created; ruanyifeng.com 科技爱好者周刊 issue 399 (Jun 5) logged with quote + translation; YouTube referral parked as unresolved
 
 ## New — ready to start Go v2
 

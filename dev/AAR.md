@@ -2,6 +2,19 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-06-12 — GitHub stats, coverage tracking, ruanyifeng feature
+
+**What went well:**
+- `urltomd` broke through YouTube's anti-scrape wall where both WebFetch and WebSearch failed — right tool, used promptly
+- Cross-referencing the Jun 5 traffic spike with Ruan Yifeng's Friday publication day narrowed the search to issue 399 immediately — the data led the investigation rather than guessing
+- The "Unresolved" section in `coverage.md` is a good pattern: parks the YouTube question without losing it, avoids a false negative
+
+**What didn't go well:**
+- Spent three search rounds on the YouTube source before concluding it's likely a comment link — could have reached that inference earlier from the 35/33 view-to-unique ratio alone
+
+**What we'll do differently:**
+- When referrer traffic is <50 views with near-1:1 view/unique ratio, treat it as a comment link by default and move on; only investigate further if the number grows
+
 ## 2026-06-12 — DDD domain model and language analysis for v2
 
 **What went well:**
