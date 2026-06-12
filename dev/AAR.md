@@ -2,6 +2,20 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-06-12 — DDD domain model and language analysis for v2
+
+**What went well:**
+- Cross-repo research (meds DDD doc + language-suitability + polyglot research) gave the domain model richer grounding than starting from scratch — language verdict was evidence-based, not opinion
+- "Single entity (SessionState)" is a genuinely load-bearing finding — everything else in the domain is pure data; will shape Go v2 architecture concretely
+- The `--mode` open question from the DSL spec was resolved as a byproduct of DDD analysis (`SafetyMode` is a `validate()` parameter at config time, not a runtime flag)
+- All changes committed and pushed cleanly in one session with full cross-references
+
+**What didn't go well:**
+- Cross-references (breathing-dsl-spec.md header, CLAUDE.md file layout) were added after the domain model was written rather than planned up front — minor, caught before commit
+
+**What we'll do differently:**
+- When creating a new spec/design document, identify cross-references to and from existing docs as part of drafting, not as a post-write check
+
 ## 2026-06-08 — Feature idea backlog and metrics snapshot
 
 **What went well:**
