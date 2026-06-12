@@ -2,6 +2,18 @@
 
 Periodic snapshots of repo traction. Newest first.
 
+## 2026-06-12
+
+| Metric | Value |
+|---|---|
+| Stars | 302 |
+| Forks | 11 |
+| Open issues | 6 |
+| Open PRs | 1 |
+| Merged PRs | 1 |
+
+**Notes:** +27 stars since Jun 8 (+4d). Crossed 300 stars. One new open issue since last snapshot. 1 external PR (coherence preset) still open. Last push today (Go v2 domain model work). Growth rate ~7 stars/day — sustained post-HN baseline.
+
 ## 2026-06-08
 
 | Metric | Value |
