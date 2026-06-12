@@ -71,5 +71,6 @@ dev/
   NEXT-SESSION.md     # session continuity notes
   social-card.html    # social card design template
   github-metrics.md   # periodic GitHub stats snapshots (stars, forks, issues, PRs)
+  coverage.md         # notable mentions: newsletters, blogs, social, press
   repo-stats.md       # draft /repo-stats skill (move to ~/.claude/commands/ when ready)
 ```
