@@ -23,6 +23,7 @@ classifiers = [
     "Intended Audience :: Healthcare Industry",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
 ]

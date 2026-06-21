@@ -110,7 +110,7 @@ This app is deliberately constrained. Several common breathing-app features are 
 
 ## Requirements
 
-- macOS (uses `/usr/bin/afplay` for audio cues) or Windows 11 (uses `winsound`)
+- macOS (uses `/usr/bin/afplay`), Windows 11 (uses `winsound`), or Linux (auto-detects a sound player — see [Linux audio](#linux-audio))
 - Python 3.7+
 
 ## Installation
@@ -172,6 +172,7 @@ Duration: 1–60 minutes (rounded up to complete breath cycles). Ratio: inhale a
 | `--duration MIN`  | `-d`  | Session length in minutes (1–60)           |
 | `--ratio IN-EX`   | `-r`  | Breath ratio, e.g. `5-5` or `4-6`         |
 | `--no-sound`      | `-n`  | Disable audio cues                         |
+| `--sound-player`  |       | Linux audio player command (auto-detected) |
 | `--quiet`         | `-q`  | Suppress startup warnings                  |
 | `--no-log`        |       | Don't log this session                     |
 | `--log`           |       | Print log file path and exit               |
@@ -205,6 +206,23 @@ During a session:
 The status indicator shows `●` during breathing, `‖` when paused, and `🔇` when muted.
 
 The countdown timer tracks completed breathing time only. If you pause for 30 seconds during a 1-minute session, the session takes ~90 seconds of wall-clock time to complete — the timer doesn't advance while paused.
+
+## Linux audio
+
+Linux has no single standard way to play a sound, so Breathe CLI probes for a player and falls back gracefully:
+
+1. **Player** — the first of `paplay`, `pw-play`, `aplay`, `ffplay`, `cvlc` found on your `PATH`. Override with `--sound-player CMD` or the `BREATHE_SOUND_PLAYER` env var.
+2. **Sounds** — the freedesktop theme (`/usr/share/sounds/freedesktop/stereo/message.oga` for inhale, `complete.oga` for exhale). Override with `BREATHE_SOUND_INHALE` / `BREATHE_SOUND_EXHALE` (any file your player accepts).
+3. **Fallback** — if no player or sound file is found, Breathe CLI uses the terminal bell, exactly as before.
+
+```bash
+# Use a specific player and custom cues
+BREATHE_SOUND_INHALE=~/sounds/in.wav \
+BREATHE_SOUND_EXHALE=~/sounds/out.wav \
+breathe --sound-player paplay
+```
+
+Most desktop distros ship `paplay` (PulseAudio) or `pw-play` (PipeWire) and the freedesktop sounds, so audio usually works with no configuration.
 
 ## Session logging
 
