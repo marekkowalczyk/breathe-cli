@@ -2,6 +2,18 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-07-29 — Install on new machine; bare-invocation design review
+
+**What went well:**
+- Install verification was thorough before symlinking: checked Python version, `afplay` presence, both sound files, and ran the full test suite (42 tests, all passing) rather than assuming stdlib-only + macOS-only meant no verification was needed
+- Talked through the bare-`breathe`-invocation design question (time-of-day auto-preset vs. fixed default vs. Unix-help-first convention) with explicit options and tradeoffs before touching anything
+
+**What didn't go well:**
+- Nothing notable — no code changed this session, no corrections needed
+
+**What we'll do differently:**
+- Nothing process-wise. Decision of record: bare `breathe` keeps auto-selecting preset by time of day; the existing 3-2-1 countdown (which displays the selected preset/duration and accepts `q`) was judged sufficient as a confirmation window. Revisit only if the midday `long` (20 min) default turns out to not match actual usage patterns.
+
 ## 2026-05-15 — Add session logging and TODO items
 
 **What went well:**
