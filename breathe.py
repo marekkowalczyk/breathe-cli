@@ -82,6 +82,8 @@ This app deliberately does NOT support:
 
 Press q or Ctrl+C to end any session. Exit is always immediate."""
 
+# ── Data model ───────────────────────────────────────────────────────
+
 @dataclass
 class Config:
     duration_s: int
@@ -115,6 +117,8 @@ class Layout:
     use_colour: bool
     use_unicode: bool
 
+# ── Terminal capability detection (impure — reads env/tty) ─────────
+
 def supports_colour():
     if os.environ.get('NO_COLOR'):
         return False
@@ -123,6 +127,8 @@ def supports_colour():
 def supports_unicode():
     enc = getattr(sys.stdout, 'encoding', '') or ''
     return 'utf' in enc.lower()
+
+# ── Pure formatting/arithmetic helpers (unit-tested) ────────────────
 
 def format_mmss(seconds):
     m, s = divmod(int(seconds), 60)
@@ -133,6 +139,8 @@ def format_human(seconds):
     if m > 0:
         return '{} min {} s'.format(m, s)
     return '{} s'.format(s)
+
+# ── Layout computation (impure — reads terminal size) ───────────────
 
 def compute_layout():
     size = shutil.get_terminal_size((80, 24))
@@ -150,6 +158,8 @@ def compute_layout():
         use_colour=supports_colour(),
         use_unicode=supports_unicode(),
     )
+
+# ── Audio subsystem (impure — filesystem, subprocess) ───────────────
 
 def check_audio(quiet):
     """Init audio subsystem. Returns 'afplay' or 'bell'."""
@@ -175,6 +185,8 @@ def play_sound(phase, audio_mode):
     elif audio_mode == 'bell':
         sys.stdout.write('\a')
         sys.stdout.flush()
+
+# ── Terminal raw-mode / key polling (impure) ────────────────────────
 
 def setup_raw_tty():
     if not sys.stdin.isatty():
@@ -203,6 +215,8 @@ def poll_key():
     except (OSError, ValueError):
         pass
     return None
+
+# ── Rendering (impure — writes to stdout) ───────────────────────────
 
 def move_to(row, col):
     sys.stdout.write('\033[{};{}H'.format(row, col))
@@ -298,6 +312,8 @@ def render_frame(layout, config, elapsed, remaining_s, phase, progress,
     draw_progress(layout, config, elapsed)
     draw_footer(layout, paused)
     sys.stdout.flush()
+
+# ── Session loop (impure — signals, timing, keyboard/stdout I/O) ────
 
 _abort = [False]
 
@@ -492,10 +508,14 @@ def run_session(config, result):
         restore_tty(old_termios)
         signal.signal(signal.SIGINT, old_sigint)
 
+# ── Pure completion arithmetic (unit-tested) ────────────────────────
+
 def _completion(config, result):
     pct = min(100, int(result.elapsed / config.duration_s * 100)) if config.duration_s > 0 else 100
     status = 'completed' if result.completed else 'ended early (user)'
     return pct, status
+
+# ── Summary, logging, and info-mode output (impure) ──────────────────
 
 def print_summary(config, result):
     label = config.preset_name if config.preset_name != 'custom' else 'custom'
@@ -550,6 +570,10 @@ def print_presets():
         ratio = '{}s-{}s ({:.0f} bpm)'.format(p['inhale_s'], p['exhale_s'], bpm)
         print(fmt.format(name, '{} min'.format(p['duration_min']),
                          ratio, PRESET_DESCRIPTIONS[name]))
+
+# ── CLI parsing & validation ─────────────────────────────────────────
+# parse_ratio and try_parse_goal_words are pure logic (unit-tested) that
+# call _die on invalid input, so a bad SystemExit is loud, not silent.
 
 def _die(msg):
     sys.stderr.write('Error: ' + msg + '\n')
@@ -622,6 +646,8 @@ def build_parser():
     parser.add_argument('--no-log', action='store_true',
                         help='Suppress session logging for this run')
     return parser
+
+# ── Entry point (impure — orchestration) ─────────────────────────────
 
 def main():
     if sys.version_info < (3, 7):
