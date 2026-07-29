@@ -2,8 +2,8 @@
 title: 'Breathe CLI — Safety & Acceptance Tests'
 subtitle: 'Reference document for a paced-breathing terminal app'
 author: 'Marek Kowalczyk (spec by Claude, for Claude Opus 4.6)'
-date: 2026-05-30
-version: 1.6
+date: 2026-07-29
+version: 1.8
 target_platform: 'macOS 10.14.6 (Mojave)'
 target_runtime: 'Python 3.7+ stdlib only'
 status: 'implementation complete — this document retains safety constraints and acceptance tests'
@@ -44,6 +44,13 @@ animation loops, no terminal left in a broken state.
 countdown during which the user can settle, close other apps, or abort
 without having "missed" any breaths.
 
+**C6. Goal-word shorthand stays inside the safe envelope.** The
+order-free `breathe quick calm` style shorthand (`GOAL_DURATION_WORDS`,
+`GOAL_RATIO_WORDS` in `breathe.py`) only ever resolves to fixed,
+pre-validated duration/ratio pairs — the same constraints (C1, C2) still
+apply, and ambiguous or conflicting word combinations (e.g. `breathe
+quick long`) are rejected with an explicit error rather than guessed.
+
 ### Rejected inputs (with explicit safety messaging)
 
 | User input | Response |
@@ -61,7 +68,7 @@ Manual tests, no framework required. Run in order.
 ### 3.1 Smoke tests
 
 1. `breathe --help` prints help and exits 0.
-2. `breathe --version` prints `breathe 1.6` and exits 0.
+2. `breathe --version` prints `breathe {VERSION}` (matching `breathe.py`'s `VERSION` constant) and exits 0.
 3. `breathe --safety` prints the safety block and exits 0.
 4. `breathe --list-presets` prints the preset table and exits 0.
 5. `breathe -d 1` runs for ~60 seconds, renders breath animation, exits cleanly with `completed` status.
@@ -106,3 +113,9 @@ Manual tests, no framework required. Run in order.
 23. `breathe --log` prints the log file path and exits 0.
 24. Delete `~/.breathe_log.csv`, run `breathe --log`: prints path with "(no sessions logged yet)".
 25. `chmod 000 ~/.breathe_log.csv`, run `breathe -d 1`: session completes normally, stderr shows a one-line warning about logging failure. Restore permissions afterwards.
+
+### 3.8 Goal-word shorthand tests
+
+26. `breathe quick calm` and `breathe calm quick` both start a 3-minute 4-6 session — order does not change the result.
+27. `breathe quick long` exits non-zero with a "Conflicting duration words" error.
+28. `breathe quick -n` (a goal word combined with a flag) falls through to argparse's normal "unrecognized arguments" error rather than silently applying `quick` and ignoring `-n`.

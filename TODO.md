@@ -25,6 +25,15 @@ binding limit.
 
 ## Done
 
+### ~~15. Goal-word shorthand (`breathe quick calm`)~~ DONE (v1.8)
+Order-free keyword args mapping to duration/ratio without requiring
+knowledge of presets or ratio syntax. `GOAL_DURATION_WORDS`
+(`quick`/`long`) and `GOAL_RATIO_WORDS` (`calm`/`energize`) are
+independent axes resolved by `try_parse_goal_words()`; anything it
+doesn't fully recognize falls through to normal argparse unchanged.
+Conflicting or repeated words on the same axis are rejected explicitly
+(never silently guessed). See spec §2 C6 and §3.8.
+
 ### ~~13. Countdown hits 00:00 one exhale-phase early~~ FIXED (v1.7)
 `duration_s` was not always a multiple of `cycle_s`. Fix: round
 `duration_s` up to a whole number of cycles at config time.

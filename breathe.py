@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.7'
+VERSION = '1.8'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
@@ -25,6 +25,12 @@ PRESETS = {
 
 PRESET_DESCRIPTIONS = {'morning': 'Daily baseline', 'evening': 'Sympathetic wind-down',
                        'long': 'Full dose, Bernardi protocol'}
+
+# Goal words: an order-free shorthand alongside --preset/-d/-r, e.g.
+# `breathe quick calm`. Each word sets one axis; axes are independent
+# so any duration word may combine with any ratio word.
+GOAL_DURATION_WORDS = {'quick': 3, 'long': 20}
+GOAL_RATIO_WORDS = {'calm': (4, 6), 'energize': (5, 5)}
 
 SOUND_INHALE = '/System/Library/Sounds/Tink.aiff'
 SOUND_EXHALE = '/System/Library/Sounds/Pop.aiff'
@@ -569,11 +575,31 @@ def parse_ratio(ratio_str):
         _die('Exhale must be 3\u201310 seconds.')
     return inhale, exhale
 
+def try_parse_goal_words(argv):
+    """If argv is entirely recognized goal words, in any order, resolve
+    them to a (duration_min, inhale_s, exhale_s, label) tuple. Returns
+    None if argv doesn't fully match, so flags/--preset/-d/-r fall
+    through to normal argparse unchanged."""
+    if not argv:
+        return None
+    words = [a.lower() for a in argv]
+    if not all(w in GOAL_DURATION_WORDS or w in GOAL_RATIO_WORDS for w in words):
+        return None
+    duration_hits = [w for w in words if w in GOAL_DURATION_WORDS]
+    ratio_hits = [w for w in words if w in GOAL_RATIO_WORDS]
+    if len(duration_hits) > 1:
+        _die('Conflicting duration words: {}.'.format(', '.join(duration_hits)))
+    if len(ratio_hits) > 1:
+        _die('Conflicting goal words: {}.'.format(', '.join(ratio_hits)))
+    duration_min = GOAL_DURATION_WORDS[duration_hits[0]] if duration_hits else 10
+    inhale_s, exhale_s = GOAL_RATIO_WORDS[ratio_hits[0]] if ratio_hits else (5, 5)
+    return duration_min, inhale_s, exhale_s, '+'.join(words)
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog='breathe',
         description='Paced breathing for HFrEF vagal training.',
-        epilog='Example: breathe --preset morning',
+        epilog='Example: breathe --preset morning  |  breathe quick calm',
     )
     parser.add_argument('--version', action='version',
                         version='breathe {}'.format(VERSION))
@@ -602,49 +628,56 @@ def main():
         sys.stderr.write('Error: breathe requires Python 3.7+\n')
         sys.exit(1)
 
-    parser = build_parser()
-    args = parser.parse_args()
-
-    if args.safety:
-        print_safety()
-        sys.exit(0)
-
-    if args.log:
-        print_log_path()
-        sys.exit(0)
-
-    if args.list_presets:
-        print_presets()
-        sys.exit(0)
-
-    # Build config from args
-    if args.preset:
-        if args.duration is not None or args.ratio is not None:
-            _die('--preset cannot be combined with --duration or --ratio.')
-        p = PRESETS[args.preset]
-        inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
-        duration_min = p['duration_min']
-        preset_name = args.preset
-    elif args.duration is not None or args.ratio is not None:
-        inhale_s, exhale_s = 5, 5
-        duration_min = 10
-        preset_name = 'custom'
-        if args.ratio:
-            inhale_s, exhale_s = parse_ratio(args.ratio)
-        if args.duration is not None:
-            duration_min = args.duration
+    goal = try_parse_goal_words(sys.argv[1:])
+    if goal is not None:
+        duration_min, inhale_s, exhale_s, preset_name = goal
+        no_sound, quiet, no_log = False, False, False
     else:
-        # No args: auto-select preset by time of day
-        hour = time.localtime().tm_hour
-        if hour < 12:
-            preset_name = 'morning'
-        elif hour < 17:
-            preset_name = 'long'
+        parser = build_parser()
+        args = parser.parse_args()
+
+        if args.safety:
+            print_safety()
+            sys.exit(0)
+
+        if args.log:
+            print_log_path()
+            sys.exit(0)
+
+        if args.list_presets:
+            print_presets()
+            sys.exit(0)
+
+        # Build config from args
+        if args.preset:
+            if args.duration is not None or args.ratio is not None:
+                _die('--preset cannot be combined with --duration or --ratio.')
+            p = PRESETS[args.preset]
+            inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
+            duration_min = p['duration_min']
+            preset_name = args.preset
+        elif args.duration is not None or args.ratio is not None:
+            inhale_s, exhale_s = 5, 5
+            duration_min = 10
+            preset_name = 'custom'
+            if args.ratio:
+                inhale_s, exhale_s = parse_ratio(args.ratio)
+            if args.duration is not None:
+                duration_min = args.duration
         else:
-            preset_name = 'evening'
-        p = PRESETS[preset_name]
-        inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
-        duration_min = p['duration_min']
+            # No args: auto-select preset by time of day
+            hour = time.localtime().tm_hour
+            if hour < 12:
+                preset_name = 'morning'
+            elif hour < 17:
+                preset_name = 'long'
+            else:
+                preset_name = 'evening'
+            p = PRESETS[preset_name]
+            inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
+            duration_min = p['duration_min']
+
+        no_sound, quiet, no_log = args.no_sound, args.quiet, args.no_log
 
     if not (1 <= duration_min <= 60):
         _die('Duration must be 1\u201360 minutes.')
@@ -659,8 +692,8 @@ def main():
         inhale_s=inhale_s,
         exhale_s=exhale_s,
         preset_name=preset_name,
-        sound_enabled=not args.no_sound,
-        quiet=args.quiet,
+        sound_enabled=not no_sound,
+        quiet=quiet,
     )
 
     result = Result()
@@ -676,7 +709,7 @@ def main():
 
     print_summary(config, result)
 
-    if not args.no_log:
+    if not no_log:
         log_session(config, result, session_start_time)
 
     if exc_info is not None:

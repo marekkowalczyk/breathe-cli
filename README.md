@@ -90,6 +90,29 @@ breathe --preset long       # 20 min, 4s-6s (full Bernardi protocol dose)
 breathe --list-presets       # show the table
 ```
 
+### Goal words
+
+```bash
+breathe quick calm       # 3 min, 4-6 ratio
+breathe calm quick       # same as above — order doesn't matter
+breathe quick            # 3 min, default 5-5 ratio
+breathe energize         # default 10 min, 5-5 ratio
+```
+
+An order-free shorthand for people who don't want to think in minutes and
+ratios. Each word sets one independent axis:
+
+| Axis     | Words                | Effect                          |
+|----------|-----------------------|----------------------------------|
+| Duration | `quick`, `long`       | 3 min, or 20 min                |
+| Feel     | `calm`, `energize`    | 4-6 ratio, or 5-5 ratio          |
+
+Words can appear in any order and combine freely across axes. Two words
+for the same axis (e.g. `breathe quick long`) is rejected as an explicit
+error rather than silently picking one. Goal words don't combine with
+flags — use `--duration`/`--ratio` directly if you need `--no-sound`,
+`--quiet`, etc. alongside a custom session.
+
 ### Custom sessions
 
 ```bash
@@ -162,7 +185,7 @@ Automated tests cover logic and arithmetic (formatting, ratio parsing, safety re
 python3 -m unittest test_breathe -v
 ```
 
-TUI behaviour (rendering, animation, terminal restoration) is covered by 25 manual acceptance tests in `breathe-cli-spec.md`.
+TUI behaviour (rendering, animation, terminal restoration) is covered by the manual acceptance tests in `breathe-cli-spec.md`.
 
 ## Safety
 

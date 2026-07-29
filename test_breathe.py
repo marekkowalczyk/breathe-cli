@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Unit tests for breathe.py — logic and arithmetic only, no TUI."""
 
+import io
 import os
 import sys
 import unittest
+from contextlib import redirect_stderr
 
 # Import the module under test
 sys.path.insert(0, os.path.dirname(__file__))
@@ -353,6 +355,88 @@ class TestConstants(unittest.TestCase):
     def test_frame_rate(self):
         self.assertGreater(breathe.FRAME_RATE_HZ, 0)
         self.assertAlmostEqual(breathe.FRAME_SLEEP, 1.0 / breathe.FRAME_RATE_HZ)
+
+
+class TestGoalWords(unittest.TestCase):
+    """try_parse_goal_words must either resolve unambiguously or fail
+    loudly (SystemExit + stderr message) or return None — it must
+    never silently guess or silently drop a word."""
+
+    def test_vocabularies_disjoint(self):
+        overlap = set(breathe.GOAL_DURATION_WORDS) & set(breathe.GOAL_RATIO_WORDS)
+        self.assertEqual(overlap, set(),
+                         'a word must not be ambiguous between axes: {}'.format(overlap))
+
+    def test_ratio_words_meet_safety_floor(self):
+        for word, (inhale_s, exhale_s) in breathe.GOAL_RATIO_WORDS.items():
+            self.assertGreaterEqual(inhale_s + exhale_s, breathe.MIN_CYCLE_SECS,
+                                    '{!r} cycle too short'.format(word))
+
+    def test_duration_words_in_valid_range(self):
+        for word, duration_min in breathe.GOAL_DURATION_WORDS.items():
+            self.assertTrue(1 <= duration_min <= 60,
+                            '{!r} duration out of range'.format(word))
+
+    def test_empty_argv_returns_none(self):
+        self.assertIsNone(breathe.try_parse_goal_words([]))
+
+    def test_unrecognized_word_returns_none(self):
+        self.assertIsNone(breathe.try_parse_goal_words(['zen']))
+
+    def test_mixed_recognized_and_unrecognized_returns_none(self):
+        # A typo or unknown word must not cause the recognized words
+        # to be silently applied — the whole argv falls through.
+        self.assertIsNone(breathe.try_parse_goal_words(['quick', 'zen']))
+
+    def test_flag_token_returns_none(self):
+        # Goal words never combine with dash flags; must fall through
+        # to argparse rather than silently ignoring the flag.
+        self.assertIsNone(breathe.try_parse_goal_words(['quick', '-n']))
+
+    def test_duration_word_only_defaults_ratio(self):
+        self.assertEqual(breathe.try_parse_goal_words(['quick']),
+                         (3, 5, 5, 'quick'))
+
+    def test_ratio_word_only_defaults_duration(self):
+        self.assertEqual(breathe.try_parse_goal_words(['calm']),
+                         (10, 4, 6, 'calm'))
+
+    def test_both_axes_resolve(self):
+        self.assertEqual(breathe.try_parse_goal_words(['quick', 'calm']),
+                         (3, 4, 6, 'quick+calm'))
+
+    def test_order_independent(self):
+        a = breathe.try_parse_goal_words(['quick', 'calm'])
+        b = breathe.try_parse_goal_words(['calm', 'quick'])
+        self.assertEqual(a[:3], b[:3])
+
+    def test_case_insensitive(self):
+        self.assertEqual(breathe.try_parse_goal_words(['QUICK', 'Calm']),
+                         (3, 4, 6, 'quick+calm'))
+
+    def test_conflicting_duration_words_raise_with_message(self):
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit) as ctx:
+                breathe.try_parse_goal_words(['quick', 'long'])
+        self.assertEqual(ctx.exception.code, 1)
+        self.assertIn('Conflicting duration words', buf.getvalue())
+
+    def test_conflicting_ratio_words_raise_with_message(self):
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit) as ctx:
+                breathe.try_parse_goal_words(['calm', 'energize'])
+        self.assertEqual(ctx.exception.code, 1)
+        self.assertIn('Conflicting goal words', buf.getvalue())
+
+    def test_repeated_same_word_raises(self):
+        # Even a repeated (non-conflicting) word must not be silently
+        # deduplicated — it's still ambiguous input to reject loudly.
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit):
+                breathe.try_parse_goal_words(['quick', 'quick'])
 
 
 if __name__ == '__main__':
