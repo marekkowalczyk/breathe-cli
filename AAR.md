@@ -2,6 +2,52 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-07-29 — Goal-word shorthand, v1.8 release, pure/impure section headers
+
+Two commits since the last close: goal-word shorthand (`breathe quick calm`, order-free,
+falls through to argparse for anything unrecognized) plus a version bump and doc-drift
+cleanup, then a comment-only pass adding pure/impure section headers. `v1.8` tagged,
+released on GitHub, and the tag later moved to include the section-header commit. 57/57
+tests passing, tree clean, nothing unpushed.
+
+**What went well:**
+- **The goal-word feature was scoped by explicit question before any code**, not assumed:
+  preset-alongside-vs-replace, conflict handling, vocabulary size, and timing were each
+  asked and answered before `try_parse_goal_words` was written, keeping the vocabulary to
+  the agreed 2×2 rather than growing organically.
+- **Caught real open loops before tagging** rather than tagging on request alone: version
+  not bumped, a stale "25 manual tests" count in two docs, and a pre-existing spec/code
+  version mismatch were all found and flagged, and the user chose to fix all three before
+  release.
+- **The "no derivable numbers in docs" principle got applied immediately**, not just
+  written down: the spec's own `--version` acceptance test was rephrased to reference the
+  `VERSION` constant instead of a literal string, in the same pass that added the rule.
+- **The 700-line cap flagged as worth revisiting back on 2026-05-15 ("the file is already
+  well past the 500-line target") was actually revisited this session** — removed from
+  `CLAUDE.md` at the user's request, rather than continuing to spend effort on cosmetic
+  compaction against a cap nobody had re-examined in two months.
+
+**What didn't go well:**
+- **Repo confusion: an unrelated project's work (`meds`) got initiated in the middle of
+  this `breathe` session**, and had to be untangled afterward with a separate partial
+  close in that repo. The user named this as their own mistake, not a correction of me,
+  but it cost a full detour and a scoped close to unwind — worth naming here since it's
+  exactly the kind of cross-project drift a close is supposed to catch.
+- **A CLI smoke test hit the 120-second background timeout** because it ran `breathe`'s
+  non-TTY path with default (multi-minute) durations instead of a short custom one — had
+  to kill the backgrounded process and re-verify by calling `try_parse_goal_words`
+  directly instead of shelling out to the full CLI.
+
+**What we'll do differently:**
+- **If a request names or clearly concerns a different project/repo than the one the
+  session is rooted in, say so and confirm before doing any work there**, rather than
+  proceeding inline and sorting out the scope afterward with a partial close. First
+  occurrence of this specific drift in this repo's history — process note, not yet a rule.
+- **When smoke-testing a CLI's non-TTY path, always pass a short explicit duration
+  (`-d 1` or shorter via a custom ratio) — never rely on defaults**, which can run
+  multiple minutes and blow past a background command's timeout. Mechanical: check the
+  command includes `-d` before backgrounding it.
+
 ## 2026-07-29 — Install on new machine; bare-invocation design review
 
 **What went well:**
