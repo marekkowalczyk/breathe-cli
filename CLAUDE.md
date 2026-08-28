@@ -96,6 +96,7 @@ After product commits that bump `VERSION`, and on session close, run:
 - If `VERSION` is ahead of the latest `v*` tag, surface the script’s suggestion in chat and (on close) under NEXT-SESSION **Immediate**.
 - If tags match, no action.
 - Creating the tag/release still requires the user to authorize a release publish (same spirit as push authorization).
+- **Docs audit before close** after a fold, release, or user-visible TUI/CLI change: check `README.md` and the [`homebrew-breathe`](https://github.com/marekkowalczyk/homebrew-breathe) tap README against tip (presets, install/`brew trust`, display chrome). Do not wait for the user to ask whether docs are current.
 
 ## Commits
 

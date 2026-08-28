@@ -2,6 +2,22 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-28 — Fold private into public breathe-cli; brew path; footer stamp
+
+Folded private `breathe` into public [`breathe-cli`](https://github.com/marekkowalczyk/breathe-cli) (PR #12, LICENSE kept, private product won). Migrated backlog to public #13–#20; archived private repo; local clone retargeted to `~/repos/breathe-cli`. Tagged **v1.11** then **v1.11.1**; Homebrew formula bumped both times. Documented PATH `breathe` (Cellar) vs tip (`python3 breathe.py` / `breathe-dev`). Shipped discreet footer `VERSION · RELEASED`. Filed [#21](https://github.com/marekkowalczyk/breathe-cli/issues/21) (`breathe stats`). Synced README / spec / AAR / tap README after user asked whether docs were current. 69 tests OK; tip matches tag v1.11.1.
+
+**What went well:**
+- **Kept public identity for stars:** merge into `breathe-cli` (not rename/delete) preserved community issues and Homebrew URL.
+- **Conflict policy locked before merge:** private product + public LICENSE; avoided force-push.
+- **Install split written into CLAUDE.md** once brew and tip diverged — agents have an explicit smoke-test rule.
+
+**What didn't go well:**
+- **User had to ask “are all docs up to date?”** after the fold and footer ship — README still taught clone/symlink and `INHALE`; tap README still showed `--preset calm`. Product and process docs lagged the ship.
+- **Homebrew friction was under-documented at first** (tap trust, link overwrite of an old repo symlink) — fixed in README/CLAUDE only after the user hit the errors.
+
+**What we'll do differently:**
+- **After any fold, release, or user-visible TUI/CLI change:** before session close, diff tip against `README.md` and `marekkowalczyk/homebrew-breathe` README (presets, install, display chrome). Do not wait for the user to audit. Promoted to `CLAUDE.md` § Releases.
+
 ## 2026-08-28 (morning) — Version string + RELEASED policy; `-v` short flag
 
 Added `-v` for `--version`, then `RELEASED` (minute-precision local datetime) beside
