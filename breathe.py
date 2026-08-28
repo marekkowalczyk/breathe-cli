@@ -15,21 +15,24 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.9'
+VERSION = '1.10'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-28T09:00'
+RELEASED = '2026-08-28T09:50'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
+    'midday':  {'duration_min': 20, 'inhale_s': 4, 'exhale_s': 6},
     'evening': {'duration_min': 15, 'inhale_s': 4, 'exhale_s': 6},
-    'long':    {'duration_min': 20, 'inhale_s': 4, 'exhale_s': 6},
     'night':   {'duration_min': 20, 'inhale_s': 3, 'exhale_s': 7},
 }
 
-PRESET_DESCRIPTIONS = {'morning': 'Daily baseline', 'evening': 'Sympathetic wind-down',
-                       'long': 'Full dose, Bernardi protocol',
-                       'night': 'Pre-sleep calming'}
+PRESET_DESCRIPTIONS = {
+    'morning': 'Daily baseline',
+    'midday':  'Full dose, Bernardi protocol',
+    'evening': 'Sympathetic wind-down',
+    'night':   'Pre-sleep calming',
+}
 
 # Goal words: an order-free shorthand alongside --preset/-d/-r, e.g.
 # `breathe quick calm`. Each word sets one axis; axes are independent
@@ -94,7 +97,7 @@ class Config:
     duration_s: int
     inhale_s: int
     exhale_s: int
-    preset_name: str       # 'morning', 'evening', 'long', 'night', or 'custom'
+    preset_name: str       # 'morning', 'midday', 'evening', 'night', or 'custom'
     sound_enabled: bool
     quiet: bool
 
@@ -587,7 +590,7 @@ def preset_for_hour(hour):
     if hour < 12:
         return 'morning'
     if hour < 17:
-        return 'long'
+        return 'midday'
     return 'evening'
 
 # ── CLI parsing & validation ─────────────────────────────────────────
@@ -651,7 +654,7 @@ def build_parser():
     parser.add_argument('--list-presets', action='store_true',
                         help='Show available presets and exit')
     parser.add_argument('--preset', '-p', choices=list(PRESETS.keys()),
-                        help='Use a named preset (morning, evening, long, night)')
+                        help='Use a named preset (morning, midday, evening, night)')
     parser.add_argument('--duration', '-d', type=int, metavar='MINUTES',
                         help='Session duration in minutes (1\u201360, default: 10)')
     parser.add_argument('--ratio', '-r', metavar='IN-EX',

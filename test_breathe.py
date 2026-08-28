@@ -88,6 +88,12 @@ class TestPresets(unittest.TestCase):
         for name in breathe.PRESETS:
             self.assertIn(name, breathe.PRESET_DESCRIPTIONS)
 
+    def test_presets_ordered_by_time_of_day(self):
+        self.assertEqual(
+            list(breathe.PRESETS.keys()),
+            ['morning', 'midday', 'evening', 'night'],
+        )
+
     def test_night_preset_tsai_protocol(self):
         p = breathe.PRESETS['night']
         self.assertEqual(
@@ -101,7 +107,7 @@ class TestPresetForHour(unittest.TestCase):
         cases = [
             (0, 'night'), (1, 'night'), (5, 'night'),
             (6, 'morning'), (7, 'morning'), (11, 'morning'),
-            (12, 'long'), (16, 'long'),
+            (12, 'midday'), (16, 'midday'),
             (17, 'evening'), (19, 'evening'), (21, 'evening'),
             (22, 'night'), (23, 'night'),
         ]

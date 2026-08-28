@@ -105,7 +105,7 @@ Manual tests, no framework required. Run in order.
 19. Run `breathe` with no arguments at different times of day (or call `preset_for_hour`). Verify:
     - 22:00–05:59: header shows `night · 3-7 · 20:00 ...` (counting down)
     - 06:00–11:59: header shows `morning · 5-5 · 10:00 ...` (counting down)
-    - 12:00–16:59: header shows `long · 4-6 · 20:00 ...` (counting down)
+    - 12:00–16:59: header shows `midday · 4-6 · 20:00 ...` (counting down)
     - 17:00–21:59: header shows `evening · 4-6 · 15:00 ...` (counting down)
 
 ### 3.7 Session logging tests

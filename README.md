@@ -77,19 +77,19 @@ With no arguments, the app picks a preset based on the time of day:
 
 | Time of day  | Preset    | Duration | Ratio | BPM |
 |--------------|-----------|----------|-------|-----|
-| 22:00–05:59  | night     | 20 min   | 3s-7s | 6   |
 | 06:00–11:59  | morning   | 10 min   | 5s-5s | 6   |
-| 12:00–16:59  | long      | 20 min   | 4s-6s | 6   |
+| 12:00–16:59  | midday    | 20 min   | 4s-6s | 6   |
 | 17:00–21:59  | evening   | 15 min   | 4s-6s | 6   |
+| 22:00–05:59  | night     | 20 min   | 3s-7s | 6   |
 
-All presets target 6 breaths per minute. The `morning` preset uses equal inhale/exhale (5-5). The `evening` and `long` presets use a longer exhale (4-6) for sympathetic wind-down. The `night` preset uses a stronger exhale bias (3-7), matching the pre-sleep 6 cpm protocol studied for insomnia (Tsai et al. 2015).
+All presets target 6 breaths per minute. Names follow time of day (`morning` → `midday` → `evening` → `night`). The `morning` preset uses equal inhale/exhale (5-5). The `midday` and `evening` presets use a longer exhale (4-6) for sympathetic wind-down. The `night` preset uses a stronger exhale bias (3-7), matching the pre-sleep 6 cpm protocol studied for insomnia (Tsai et al. 2015).
 
 ### Presets
 
 ```bash
 breathe --preset morning    # 10 min, 5s-5s
+breathe --preset midday     # 20 min, 4s-6s (full Bernardi protocol dose)
 breathe --preset evening    # 15 min, 4s-6s
-breathe --preset long       # 20 min, 4s-6s (full Bernardi protocol dose)
 breathe --preset night      # 20 min, 3s-7s (pre-sleep calming)
 breathe --list-presets       # show the table
 ```
