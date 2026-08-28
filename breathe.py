@@ -637,7 +637,7 @@ def build_parser():
         description='Paced breathing for HFrEF vagal training.',
         epilog='Example: breathe --preset morning  |  breathe quick calm',
     )
-    parser.add_argument('--version', action='version',
+    parser.add_argument('--version', '-v', action='version',
                         version='breathe {}'.format(VERSION))
     parser.add_argument('--safety', action='store_true',
                         help='Show safety information and exit')

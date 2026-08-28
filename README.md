@@ -140,7 +140,7 @@ Duration: 1–60 minutes (rounded up to complete breath cycles). Ratio: inhale a
 | `--log`           |       | Print log file path and exit               |
 | `--safety`        |       | Print safety information and exit          |
 | `--list-presets`  |       | Print preset table and exit                |
-| `--version`       |       | Print version and exit                     |
+| `--version`       | `-v`  | Print version and exit                     |
 
 ### Runtime keys
 
