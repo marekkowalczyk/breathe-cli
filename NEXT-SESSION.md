@@ -30,6 +30,7 @@ Pointers only — canonical detail is on each issue:
 - [GH #8](https://github.com/marekkowalczyk/breathe/issues/8) — night dimmer TUI
 - [GH #9](https://github.com/marekkowalczyk/breathe/issues/9) — night quieter audio
 - [GH #10](https://github.com/marekkowalczyk/breathe/issues/10) — pre-commit hook for `RELEASED`
+- [GH #11](https://github.com/marekkowalczyk/breathe/issues/11) — design: rethink goal-word vocabulary
 
 ## Current state
 
