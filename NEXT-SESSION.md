@@ -43,7 +43,7 @@ Pointers only — canonical detail is on each issue:
 
 - **One issue = one shippable slice; one commit = one concern** — see `CLAUDE.md`.
 - **When to open an issue** — file first if scope can fork or must survive the session; skip for one-commit obvious fixes.
-- **Commits** — atomic, imperative subjects, why in the body; split unrelated `git diff --stat` clusters.
+- **Commits** — atomic, imperative subjects, why in the body; **commit each finished chunk without waiting to be asked**; still ask before push. See `CLAUDE.md` § Commits.
 - **Versioning:** `RELEASED` with product/`VERSION` bumps; prefer [#10](https://github.com/marekkowalczyk/breathe/issues/10) once hooked.
 - **Smoke-test CLI non-TTY with `-d 1`**, never default duration.
 - **Don't restate derivable numbers in docs** — reference `VERSION` / `RELEASED` / tests.

@@ -77,13 +77,21 @@ example: `breathe 1.10 2026-08-28T09:50`
 **One commit = one concern** — same spirit as one issue = one concern. Prefer a short series of
 atomic commits over one bundled ball.
 
+**Commit when the chunk is done — don’t wait to be asked.** As soon as a meaningful atomic
+unit of work is finished and verified (tests/smoke that matter for that change), create the
+commit. Do not leave completed slices sitting uncommitted until “commit”, “close”, or
+end-of-session. If the next slice is unrelated, commit first, then start the next.
+
 | Do | Don't |
 |---|---|
+| Commit each finished atomic chunk immediately | Batch several finished concerns into one late commit |
 | One logical change per commit (rename **or** policy **or** close) | Mix product behaviour with constitution edits “while we’re here” |
 | Imperative subject ≤ ~72 chars (“Rename preset long to midday”) | Vague subjects (“updates”, “wip”, “fix stuff”, “misc”) |
 | Body explains **why** (1–3 lines) when the why isn’t obvious | Body that restates the diff or lists every file |
 | Match / cite a GH issue when the work was issue-tracked | Stuff five issues into one commit message |
 | Split when `git diff --stat` shows unrelated clusters | Squash unrelated work to “save” commit count |
+
+**Still ask before push** unless the user already said to push. Committing locally ≠ publishing.
 
 **Prefixes (fixed where used)**
 
