@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Unit tests for breathe.py — logic and arithmetic only, no TUI."""
 
+import io
 import os
 import sys
 import unittest
+from contextlib import redirect_stderr
 
 # Import the module under test
 sys.path.insert(0, os.path.dirname(__file__))
@@ -41,12 +43,24 @@ class TestFormatHuman(unittest.TestCase):
 
 class TestConfigRatioStr(unittest.TestCase):
     def test_ratio_str(self):
-        c = breathe.Config(600, 5, 5, 'balanced', True, False)
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
         self.assertEqual(c.ratio_str, '5-5')
 
     def test_ratio_str_asymmetric(self):
-        c = breathe.Config(900, 4, 6, 'calm', True, False)
+        c = breathe.Config(900, 4, 6, 'evening', True, False)
         self.assertEqual(c.ratio_str, '4-6')
+
+
+class TestVersion(unittest.TestCase):
+    def test_version_string_includes_semver_and_released(self):
+        s = breathe.version_string()
+        self.assertTrue(s.startswith('breathe '))
+        self.assertIn(breathe.VERSION, s)
+        self.assertIn(breathe.RELEASED, s)
+
+    def test_released_minute_precision(self):
+        # YYYY-MM-DDTHH:MM — no seconds, no timezone suffix
+        self.assertRegex(breathe.RELEASED, r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$')
 
 
 class TestPresets(unittest.TestCase):
@@ -73,6 +87,35 @@ class TestPresets(unittest.TestCase):
     def test_all_presets_have_descriptions(self):
         for name in breathe.PRESETS:
             self.assertIn(name, breathe.PRESET_DESCRIPTIONS)
+
+    def test_presets_ordered_by_time_of_day(self):
+        self.assertEqual(
+            list(breathe.PRESETS.keys()),
+            ['morning', 'midday', 'evening', 'night'],
+        )
+
+    def test_night_preset_tsai_protocol(self):
+        p = breathe.PRESETS['night']
+        self.assertEqual(
+            (p['duration_min'], p['inhale_s'], p['exhale_s']),
+            (20, 3, 7),
+        )
+
+
+class TestPresetForHour(unittest.TestCase):
+    def test_hour_mapping(self):
+        cases = [
+            (0, 'night'), (1, 'night'), (5, 'night'),
+            (6, 'morning'), (7, 'morning'), (11, 'morning'),
+            (12, 'midday'), (16, 'midday'),
+            (17, 'evening'), (19, 'evening'), (21, 'evening'),
+            (22, 'night'), (23, 'night'),
+        ]
+        for hour, expected in cases:
+            self.assertEqual(
+                breathe.preset_for_hour(hour), expected,
+                'hour {} should map to {}'.format(hour, expected),
+            )
 
 
 class TestParseRatio(unittest.TestCase):
@@ -110,22 +153,6 @@ class TestParseRatio(unittest.TestCase):
         with self.assertRaises(SystemExit):
             breathe.parse_ratio('5-11')  # exhale > 10
 
-    def test_extreme_ratio_rejected(self):
-        with self.assertRaises(SystemExit):
-            breathe.parse_ratio('3-7')  # exhale > 2x inhale
-        with self.assertRaises(SystemExit):
-            breathe.parse_ratio('3-10')
-        with self.assertRaises(SystemExit):
-            breathe.parse_ratio('4-9')
-        with self.assertRaises(SystemExit):
-            breathe.parse_ratio('4-10')
-
-    def test_moderate_ratio_accepted(self):
-        self.assertEqual(breathe.parse_ratio('4-8'), (4, 8))  # exhale == 2x inhale
-        self.assertEqual(breathe.parse_ratio('5-10'), (5, 10))
-        self.assertEqual(breathe.parse_ratio('5-7'), (5, 7))
-        self.assertEqual(breathe.parse_ratio('3-6'), (3, 6))  # exactly 2x
-
     def test_non_numeric_rejected(self):
         with self.assertRaises(SystemExit):
             breathe.parse_ratio('foo')
@@ -137,14 +164,14 @@ class TestParseRatio(unittest.TestCase):
 
 class TestCompletion(unittest.TestCase):
     def test_completed(self):
-        c = breathe.Config(600, 5, 5, 'balanced', True, False)
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
         r = breathe.Result(breaths=60, elapsed=600.0, completed=True)
         pct, status = breathe._completion(c, r)
         self.assertEqual(pct, 100)
         self.assertEqual(status, 'completed')
 
     def test_aborted_partial(self):
-        c = breathe.Config(600, 5, 5, 'balanced', True, False)
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
         r = breathe.Result(breaths=30, elapsed=300.0, completed=False, aborted=True)
         pct, status = breathe._completion(c, r)
         self.assertEqual(pct, 50)
@@ -157,7 +184,7 @@ class TestCompletion(unittest.TestCase):
         self.assertEqual(pct, 100)
 
     def test_pct_capped_at_100(self):
-        c = breathe.Config(600, 5, 5, 'balanced', True, False)
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
         r = breathe.Result(elapsed=650.0, completed=True)
         pct, _ = breathe._completion(c, r)
         self.assertEqual(pct, 100)
@@ -319,7 +346,7 @@ class TestDurationRounding(unittest.TestCase):
 
     def test_divisible_unchanged(self):
         """When duration divides evenly, no rounding needed."""
-        c = breathe.Config(600, 5, 5, 'balanced', True, False)
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
         self.assertEqual(c.duration_s, 600)  # 600 / 10 = 60
 
     def test_indivisible_rounded_up(self):
@@ -337,8 +364,6 @@ class TestDurationRounding(unittest.TestCase):
             for exhale in range(3, 11):
                 cycle_s = inhale + exhale
                 if cycle_s < breathe.MIN_CYCLE_SECS:
-                    continue
-                if exhale > 2 * inhale:
                     continue
                 for duration_min in [1, 2, 3, 5, 10, 15, 20, 30, 60]:
                     raw = duration_min * 60
@@ -371,6 +396,107 @@ class TestConstants(unittest.TestCase):
     def test_frame_rate(self):
         self.assertGreater(breathe.FRAME_RATE_HZ, 0)
         self.assertAlmostEqual(breathe.FRAME_SLEEP, 1.0 / breathe.FRAME_RATE_HZ)
+
+
+class TestGoalWordsHelp(unittest.TestCase):
+    def test_help_text_lists_every_goal_word(self):
+        text = breathe.goal_words_help_text()
+        for word in breathe.GOAL_DURATION_WORDS:
+            self.assertIn(word, text)
+        for word in breathe.GOAL_RATIO_WORDS:
+            self.assertIn(word, text)
+
+    def test_help_text_driven_by_maps(self):
+        text = breathe.goal_words_help_text()
+        self.assertIn('{} min'.format(breathe.GOAL_DURATION_WORDS['quick']), text)
+        inhale, exhale = breathe.GOAL_RATIO_WORDS['calm']
+        self.assertIn('{}-{}'.format(inhale, exhale), text)
+
+    def test_parser_epilog_is_goal_words_help(self):
+        parser = breathe.build_parser()
+        self.assertEqual(parser.epilog, breathe.goal_words_help_text())
+
+
+class TestGoalWords(unittest.TestCase):
+    """try_parse_goal_words must either resolve unambiguously or fail
+    loudly (SystemExit + stderr message) or return None — it must
+    never silently guess or silently drop a word."""
+
+    def test_vocabularies_disjoint(self):
+        overlap = set(breathe.GOAL_DURATION_WORDS) & set(breathe.GOAL_RATIO_WORDS)
+        self.assertEqual(overlap, set(),
+                         'a word must not be ambiguous between axes: {}'.format(overlap))
+
+    def test_ratio_words_meet_safety_floor(self):
+        for word, (inhale_s, exhale_s) in breathe.GOAL_RATIO_WORDS.items():
+            self.assertGreaterEqual(inhale_s + exhale_s, breathe.MIN_CYCLE_SECS,
+                                    '{!r} cycle too short'.format(word))
+
+    def test_duration_words_in_valid_range(self):
+        for word, duration_min in breathe.GOAL_DURATION_WORDS.items():
+            self.assertTrue(1 <= duration_min <= 60,
+                            '{!r} duration out of range'.format(word))
+
+    def test_empty_argv_returns_none(self):
+        self.assertIsNone(breathe.try_parse_goal_words([]))
+
+    def test_unrecognized_word_returns_none(self):
+        self.assertIsNone(breathe.try_parse_goal_words(['zen']))
+
+    def test_mixed_recognized_and_unrecognized_returns_none(self):
+        # A typo or unknown word must not cause the recognized words
+        # to be silently applied — the whole argv falls through.
+        self.assertIsNone(breathe.try_parse_goal_words(['quick', 'zen']))
+
+    def test_flag_token_returns_none(self):
+        # Goal words never combine with dash flags; must fall through
+        # to argparse rather than silently ignoring the flag.
+        self.assertIsNone(breathe.try_parse_goal_words(['quick', '-n']))
+
+    def test_duration_word_only_defaults_ratio(self):
+        self.assertEqual(breathe.try_parse_goal_words(['quick']),
+                         (3, 5, 5, 'quick'))
+
+    def test_ratio_word_only_defaults_duration(self):
+        self.assertEqual(breathe.try_parse_goal_words(['calm']),
+                         (10, 4, 6, 'calm'))
+
+    def test_both_axes_resolve(self):
+        self.assertEqual(breathe.try_parse_goal_words(['quick', 'calm']),
+                         (3, 4, 6, 'quick+calm'))
+
+    def test_order_independent(self):
+        a = breathe.try_parse_goal_words(['quick', 'calm'])
+        b = breathe.try_parse_goal_words(['calm', 'quick'])
+        self.assertEqual(a[:3], b[:3])
+
+    def test_case_insensitive(self):
+        self.assertEqual(breathe.try_parse_goal_words(['QUICK', 'Calm']),
+                         (3, 4, 6, 'quick+calm'))
+
+    def test_conflicting_duration_words_raise_with_message(self):
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit) as ctx:
+                breathe.try_parse_goal_words(['quick', 'long'])
+        self.assertEqual(ctx.exception.code, 1)
+        self.assertIn('Conflicting duration words', buf.getvalue())
+
+    def test_conflicting_ratio_words_raise_with_message(self):
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit) as ctx:
+                breathe.try_parse_goal_words(['calm', 'energize'])
+        self.assertEqual(ctx.exception.code, 1)
+        self.assertIn('Conflicting goal words', buf.getvalue())
+
+    def test_repeated_same_word_raises(self):
+        # Even a repeated (non-conflicting) word must not be silently
+        # deduplicated — it's still ambiguous input to reject loudly.
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit):
+                breathe.try_parse_goal_words(['quick', 'quick'])
 
 
 if __name__ == '__main__':

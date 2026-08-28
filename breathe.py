@@ -1,44 +1,49 @@
 #!/usr/bin/env python3
-"""Breathe CLI — paced breathing for HFrEF vagal training."""
+"""Breathe CLI — paced breathing for HFrEF vagal training. macOS only."""
 
 import argparse
 import os
+import select
 import signal
 import shutil
 import subprocess
 import sys
+import termios
 import time
+import tty
 from dataclasses import dataclass
-
-if os.name != 'nt':
-    import select
-    import termios
-    import tty
-
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.9'
+VERSION = '1.11'
+# Local wall time of this release tip (minute precision). Bump with VERSION —
+# see CLAUDE.md § Versioning.
+RELEASED = '2026-08-28T10:01'
 
 PRESETS = {
-    'balanced': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
-    'calm': {'duration_min': 15, 'inhale_s': 4, 'exhale_s': 6},
-    'extended':    {'duration_min': 20, 'inhale_s': 4, 'exhale_s': 6},
+    'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
+    'midday':  {'duration_min': 20, 'inhale_s': 4, 'exhale_s': 6},
+    'evening': {'duration_min': 15, 'inhale_s': 4, 'exhale_s': 6},
+    'night':   {'duration_min': 20, 'inhale_s': 3, 'exhale_s': 7},
 }
 
-PRESET_DESCRIPTIONS = {'balanced': 'Equal ratio, neutral baseline',
-                       'calm': 'Exhale-weighted, parasympathetic emphasis',
-                       'extended': 'Full dose, Bernardi protocol'}
+PRESET_DESCRIPTIONS = {
+    'morning': 'Daily baseline',
+    'midday':  'Full dose, Bernardi protocol',
+    'evening': 'Sympathetic wind-down',
+    'night':   'Pre-sleep calming',
+}
+
+# Goal words: an order-free shorthand alongside --preset/-d/-r, e.g.
+# `breathe quick calm`. Each word sets one axis; axes are independent
+# so any duration word may combine with any ratio word.
+GOAL_DURATION_WORDS = {'quick': 3, 'long': 20}
+GOAL_RATIO_WORDS = {'calm': (4, 6), 'energize': (5, 5)}
 
 SOUND_INHALE = '/System/Library/Sounds/Tink.aiff'
 SOUND_EXHALE = '/System/Library/Sounds/Pop.aiff'
 AFPLAY       = '/usr/bin/afplay'
 AFPLAY_VOL   = '0.3'
-
-# Windows Audio
-WIN_SOUND_INHALE = os.path.join(os.environ.get('SystemRoot', 'C:\\Windows'), 'Media', 'ding.wav')
-WIN_SOUND_EXHALE = os.path.join(os.environ.get('SystemRoot', 'C:\\Windows'), 'Media', 'notify.wav')
-
 
 LOG_FILE   = os.path.expanduser('~/.breathe_log.csv')
 LOG_HEADER = 'date,time,preset,ratio,duration_target_s,duration_actual_s,breaths,completion_pct,status'
@@ -83,22 +88,16 @@ This app deliberately does NOT support:
   \u2022 Rapid breathing (kapalbhati, bhastrika, Wim Hof patterns)
   \u2022 Total breath cycles shorter than 8 seconds
 
-Press q or Ctrl+C to end any session. Exit is always immediate.
+Press q or Ctrl+C to end any session. Exit is always immediate."""
 
-DISCLAIMER: This app is not a medical device. It does not diagnose,
-treat, or prevent any condition. Consult your physician before starting
-a breathing practice, especially with a cardiac or respiratory condition.
-Use at your own risk. The author assumes no liability for any adverse
-effects. By using this app you acknowledge and accept these terms.
-
-For the clinical evidence behind these constraints, see README.md."""
+# ── Data model ───────────────────────────────────────────────────────
 
 @dataclass
 class Config:
     duration_s: int
     inhale_s: int
     exhale_s: int
-    preset_name: str       # 'balanced', 'calm', 'extended', or 'custom'
+    preset_name: str       # 'morning', 'midday', 'evening', 'night', or 'custom'
     sound_enabled: bool
     quiet: bool
 
@@ -126,6 +125,8 @@ class Layout:
     use_colour: bool
     use_unicode: bool
 
+# ── Terminal capability detection (impure — reads env/tty) ─────────
+
 def supports_colour():
     if os.environ.get('NO_COLOR'):
         return False
@@ -134,6 +135,8 @@ def supports_colour():
 def supports_unicode():
     enc = getattr(sys.stdout, 'encoding', '') or ''
     return 'utf' in enc.lower()
+
+# ── Pure formatting/arithmetic helpers (unit-tested) ────────────────
 
 def format_mmss(seconds):
     m, s = divmod(int(seconds), 60)
@@ -144,6 +147,8 @@ def format_human(seconds):
     if m > 0:
         return '{} min {} s'.format(m, s)
     return '{} s'.format(s)
+
+# ── Layout computation (impure — reads terminal size) ───────────────
 
 def compute_layout():
     size = shutil.get_terminal_size((80, 24))
@@ -162,51 +167,20 @@ def compute_layout():
         use_unicode=supports_unicode(),
     )
 
-def setup_windows_console():
-    if os.name == 'nt':
-        try:
-            import ctypes
-            from ctypes import wintypes
-            kernel32 = ctypes.windll.kernel32
-            hOut = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
-            if hOut and hOut != -1:
-                mode = wintypes.DWORD()
-                if kernel32.GetConsoleMode(hOut, ctypes.byref(mode)):
-                    # 0x0004: ENABLE_VIRTUAL_TERMINAL_PROCESSING
-                    kernel32.SetConsoleMode(hOut, mode.value | 0x0004)
-        except Exception:
-            try:
-                os.system('')
-            except Exception:
-                pass
+# ── Audio subsystem (impure — filesystem, subprocess) ───────────────
 
 def check_audio(quiet):
-    """Init audio subsystem. Returns 'winsound', 'afplay', or 'bell'."""
-    if os.name == 'nt':
-        try:
-            import winsound
-            if os.path.isfile(WIN_SOUND_INHALE) and os.path.isfile(WIN_SOUND_EXHALE):
-                return 'winsound'
-        except ImportError:
-            pass
-    else:
-        if (os.path.isfile(AFPLAY) and os.access(AFPLAY, os.X_OK)
-                and os.path.isfile(SOUND_INHALE)
-                and os.path.isfile(SOUND_EXHALE)):
-            return 'afplay'
+    """Init audio subsystem. Returns 'afplay' or 'bell'."""
+    if (os.path.isfile(AFPLAY) and os.access(AFPLAY, os.X_OK)
+            and os.path.isfile(SOUND_INHALE)
+            and os.path.isfile(SOUND_EXHALE)):
+        return 'afplay'
     if not quiet:
         sys.stderr.write('audio unavailable: falling back to terminal bell\n')
     return 'bell'
 
 def play_sound(phase, audio_mode):
-    if audio_mode == 'winsound':
-        try:
-            import winsound
-            path = WIN_SOUND_INHALE if phase == INHALE else WIN_SOUND_EXHALE
-            winsound.PlaySound(path, winsound.SND_FILENAME | winsound.SND_ASYNC)
-        except Exception:
-            pass
-    elif audio_mode == 'afplay':
+    if audio_mode == 'afplay':
         path = SOUND_INHALE if phase == INHALE else SOUND_EXHALE
         try:
             subprocess.Popen(
@@ -220,10 +194,10 @@ def play_sound(phase, audio_mode):
         sys.stdout.write('\a')
         sys.stdout.flush()
 
+# ── Terminal raw-mode / key polling (impure) ────────────────────────
+
 def setup_raw_tty():
     if not sys.stdin.isatty():
-        return None
-    if os.name == 'nt':
         return None
     try:
         old = termios.tcgetattr(sys.stdin)
@@ -233,8 +207,6 @@ def setup_raw_tty():
         return None
 
 def restore_tty(old_settings):
-    if os.name == 'nt':
-        return
     if old_settings is not None:
         try:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
@@ -244,32 +216,15 @@ def restore_tty(old_settings):
 def poll_key():
     if not sys.stdin.isatty():
         return None
-    if os.name == 'nt':
-        import msvcrt
-        try:
-            if msvcrt.kbhit():
-                ch = msvcrt.getch()
-                if ch == b'\x03':  # Ctrl+C
-                    _abort[0] = True
-                    return 'q'
-                if ch in (b'\x00', b'\xe0'):
-                    msvcrt.getch()  # read secondary byte
-                    return None
-                try:
-                    return ch.decode('utf-8', errors='ignore')
-                except Exception:
-                    return None
-        except Exception:
-            pass
-        return None
-    else:
-        try:
-            r, _, _ = select.select([sys.stdin], [], [], 0)
-            if r:
-                return sys.stdin.read(1)
-        except (OSError, ValueError):
-            pass
-        return None
+    try:
+        r, _, _ = select.select([sys.stdin], [], [], 0)
+        if r:
+            return sys.stdin.read(1)
+    except (OSError, ValueError):
+        pass
+    return None
+
+# ── Rendering (impure — writes to stdout) ───────────────────────────
 
 def move_to(row, col):
     sys.stdout.write('\033[{};{}H'.format(row, col))
@@ -366,6 +321,8 @@ def render_frame(layout, config, elapsed, remaining_s, phase, progress,
     draw_footer(layout, paused)
     sys.stdout.flush()
 
+# ── Session loop (impure — signals, timing, keyboard/stdout I/O) ────
+
 _abort = [False]
 
 def _sigint_handler(signum, frame):
@@ -415,7 +372,6 @@ def run_session(config, result):
         result.breaths = int(result.elapsed // cycle_s)
         return
 
-    setup_windows_console()
     audio_mode = check_audio(config.quiet) if config.sound_enabled else 'none'
     layout = compute_layout()
     if layout.minimal and not config.quiet:
@@ -560,10 +516,14 @@ def run_session(config, result):
         restore_tty(old_termios)
         signal.signal(signal.SIGINT, old_sigint)
 
+# ── Pure completion arithmetic (unit-tested) ────────────────────────
+
 def _completion(config, result):
     pct = min(100, int(result.elapsed / config.duration_s * 100)) if config.duration_s > 0 else 100
     status = 'completed' if result.completed else 'ended early (user)'
     return pct, status
+
+# ── Summary, logging, and info-mode output (impure) ──────────────────
 
 def print_summary(config, result):
     label = config.preset_name if config.preset_name != 'custom' else 'custom'
@@ -618,6 +578,51 @@ def print_presets():
         ratio = '{}s-{}s ({:.0f} bpm)'.format(p['inhale_s'], p['exhale_s'], bpm)
         print(fmt.format(name, '{} min'.format(p['duration_min']),
                          ratio, PRESET_DESCRIPTIONS[name]))
+    print()
+    print_goal_words()
+
+def print_goal_words():
+    print(goal_words_help_text())
+
+def goal_words_help_text():
+    """Human-readable goal-word vocabulary (driven by the maps — keep in sync)."""
+    lines = [
+        'Goal words (order-free shorthand; not flags):',
+        '',
+        '  Duration — omit for default 10 min:',
+    ]
+    for word in sorted(GOAL_DURATION_WORDS, key=GOAL_DURATION_WORDS.get):
+        lines.append('    {:<10} {} min'.format(word, GOAL_DURATION_WORDS[word]))
+    lines.append('  Feel (ratio) — omit for default 5-5:')
+    for word, (inhale_s, exhale_s) in sorted(
+            GOAL_RATIO_WORDS.items(), key=lambda kv: kv[1]):
+        lines.append('    {:<10} {}-{}'.format(word, inhale_s, exhale_s))
+    lines.extend([
+        '',
+        '  Combine across axes, any order:  breathe quick calm',
+        '  Same-axis conflicts are rejected. Do not mix with --flags;',
+        '  use --duration / --ratio when you need --no-sound, etc.',
+        '  Full table: breathe --list-presets',
+    ])
+    return '\n'.join(lines)
+
+def version_string():
+    """Text printed by --version / -v: semver + release datetime."""
+    return 'breathe {} {}'.format(VERSION, RELEASED)
+
+def preset_for_hour(hour):
+    """Map local hour (0–23) to a named preset for bare `breathe` auto-select."""
+    if hour >= 22 or hour <= 5:
+        return 'night'
+    if hour < 12:
+        return 'morning'
+    if hour < 17:
+        return 'midday'
+    return 'evening'
+
+# ── CLI parsing & validation ─────────────────────────────────────────
+# parse_ratio and try_parse_goal_words are pure logic (unit-tested) that
+# call _die on invalid input, so a bad SystemExit is loud, not silent.
 
 def _die(msg):
     sys.stderr.write('Error: ' + msg + '\n')
@@ -641,25 +646,43 @@ def parse_ratio(ratio_str):
         _die('Inhale must be 3\u201310 seconds.')
     if not (3 <= exhale <= 10):
         _die('Exhale must be 3\u201310 seconds.')
-    if exhale > 2 * inhale:
-        _die('Exhale must not exceed twice the inhale (no clinical evidence'
-             ' for extreme ratios). See README.md for details.')
     return inhale, exhale
+
+def try_parse_goal_words(argv):
+    """If argv is entirely recognized goal words, in any order, resolve
+    them to a (duration_min, inhale_s, exhale_s, label) tuple. Returns
+    None if argv doesn't fully match, so flags/--preset/-d/-r fall
+    through to normal argparse unchanged."""
+    if not argv:
+        return None
+    words = [a.lower() for a in argv]
+    if not all(w in GOAL_DURATION_WORDS or w in GOAL_RATIO_WORDS for w in words):
+        return None
+    duration_hits = [w for w in words if w in GOAL_DURATION_WORDS]
+    ratio_hits = [w for w in words if w in GOAL_RATIO_WORDS]
+    if len(duration_hits) > 1:
+        _die('Conflicting duration words: {}.'.format(', '.join(duration_hits)))
+    if len(ratio_hits) > 1:
+        _die('Conflicting goal words: {}.'.format(', '.join(ratio_hits)))
+    duration_min = GOAL_DURATION_WORDS[duration_hits[0]] if duration_hits else 10
+    inhale_s, exhale_s = GOAL_RATIO_WORDS[ratio_hits[0]] if ratio_hits else (5, 5)
+    return duration_min, inhale_s, exhale_s, '+'.join(words)
 
 def build_parser():
     parser = argparse.ArgumentParser(
         prog='breathe',
         description='Paced breathing for HFrEF vagal training.',
-        epilog='Example: breathe --preset balanced',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=goal_words_help_text(),
     )
-    parser.add_argument('--version', action='version',
-                        version='breathe {}'.format(VERSION))
+    parser.add_argument('--version', '-v', action='version',
+                        version=version_string())
     parser.add_argument('--safety', action='store_true',
                         help='Show safety information and exit')
     parser.add_argument('--list-presets', action='store_true',
-                        help='Show available presets and exit')
+                        help='Show presets and goal-word shorthand, then exit')
     parser.add_argument('--preset', '-p', choices=list(PRESETS.keys()),
-                        help='Use a named preset (balanced, calm, extended)')
+                        help='Use a named preset (morning, midday, evening, night)')
     parser.add_argument('--duration', '-d', type=int, metavar='MINUTES',
                         help='Session duration in minutes (1\u201360, default: 10)')
     parser.add_argument('--ratio', '-r', metavar='IN-EX',
@@ -674,66 +697,57 @@ def build_parser():
                         help='Suppress session logging for this run')
     return parser
 
+# ── Entry point (impure — orchestration) ─────────────────────────────
+
 def main():
     if sys.version_info < (3, 7):
         sys.stderr.write('Error: breathe requires Python 3.7+\n')
         sys.exit(1)
 
-    if hasattr(sys.stdout, 'reconfigure'):
-        try:
-            sys.stdout.reconfigure(encoding='utf-8')
-        except Exception:
-            pass
-    if hasattr(sys.stderr, 'reconfigure'):
-        try:
-            sys.stderr.reconfigure(encoding='utf-8')
-        except Exception:
-            pass
-
-
-    parser = build_parser()
-    args = parser.parse_args()
-
-    if args.safety:
-        print_safety()
-        sys.exit(0)
-
-    if args.log:
-        print_log_path()
-        sys.exit(0)
-
-    if args.list_presets:
-        print_presets()
-        sys.exit(0)
-
-    # Build config from args
-    if args.preset:
-        if args.duration is not None or args.ratio is not None:
-            _die('--preset cannot be combined with --duration or --ratio.')
-        p = PRESETS[args.preset]
-        inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
-        duration_min = p['duration_min']
-        preset_name = args.preset
-    elif args.duration is not None or args.ratio is not None:
-        inhale_s, exhale_s = 5, 5
-        duration_min = 10
-        preset_name = 'custom'
-        if args.ratio:
-            inhale_s, exhale_s = parse_ratio(args.ratio)
-        if args.duration is not None:
-            duration_min = args.duration
+    goal = try_parse_goal_words(sys.argv[1:])
+    if goal is not None:
+        duration_min, inhale_s, exhale_s, preset_name = goal
+        no_sound, quiet, no_log = False, False, False
     else:
-        # No args: auto-select preset by time of day
-        hour = time.localtime().tm_hour
-        if hour < 12:
-            preset_name = 'balanced'
-        elif hour < 17:
-            preset_name = 'extended'
+        parser = build_parser()
+        args = parser.parse_args()
+
+        if args.safety:
+            print_safety()
+            sys.exit(0)
+
+        if args.log:
+            print_log_path()
+            sys.exit(0)
+
+        if args.list_presets:
+            print_presets()
+            sys.exit(0)
+
+        # Build config from args
+        if args.preset:
+            if args.duration is not None or args.ratio is not None:
+                _die('--preset cannot be combined with --duration or --ratio.')
+            p = PRESETS[args.preset]
+            inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
+            duration_min = p['duration_min']
+            preset_name = args.preset
+        elif args.duration is not None or args.ratio is not None:
+            inhale_s, exhale_s = 5, 5
+            duration_min = 10
+            preset_name = 'custom'
+            if args.ratio:
+                inhale_s, exhale_s = parse_ratio(args.ratio)
+            if args.duration is not None:
+                duration_min = args.duration
         else:
-            preset_name = 'calm'
-        p = PRESETS[preset_name]
-        inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
-        duration_min = p['duration_min']
+            # No args: auto-select preset by time of day
+            preset_name = preset_for_hour(time.localtime().tm_hour)
+            p = PRESETS[preset_name]
+            inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
+            duration_min = p['duration_min']
+
+        no_sound, quiet, no_log = args.no_sound, args.quiet, args.no_log
 
     if not (1 <= duration_min <= 60):
         _die('Duration must be 1\u201360 minutes.')
@@ -748,8 +762,8 @@ def main():
         inhale_s=inhale_s,
         exhale_s=exhale_s,
         preset_name=preset_name,
-        sound_enabled=not args.no_sound,
-        quiet=args.quiet,
+        sound_enabled=not no_sound,
+        quiet=quiet,
     )
 
     result = Result()
@@ -765,7 +779,7 @@ def main():
 
     print_summary(config, result)
 
-    if not args.no_log:
+    if not no_log:
         log_session(config, result, session_start_time)
 
     if exc_info is not None:
