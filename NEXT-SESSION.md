@@ -28,6 +28,7 @@ Pointers only — canonical detail is on each issue (migrated from private breat
 - [GH #18](https://github.com/marekkowalczyk/breathe-cli/issues/18) — night quieter audio (was #9)
 - [GH #19](https://github.com/marekkowalczyk/breathe-cli/issues/19) — pre-commit hook for `RELEASED` (was #10)
 - [GH #20](https://github.com/marekkowalczyk/breathe-cli/issues/20) — design: rethink goal-word vocabulary (was #11)
+- [GH #21](https://github.com/marekkowalczyk/breathe-cli/issues/21) — `breathe stats` summary from session log
 
 Community issues on this repo (#4–#11 linux/golang/etc.) are separate and unchanged.
 
