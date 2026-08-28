@@ -91,7 +91,12 @@ end-of-session. If the next slice is unrelated, commit first, then start the nex
 | Match / cite a GH issue when the work was issue-tracked | Stuff five issues into one commit message |
 | Split when `git diff --stat` shows unrelated clusters | Squash unrelated work to “save” commit count |
 
-**Still ask before push** unless the user already said to push. Committing locally ≠ publishing.
+**Still ask before push** unless the user already authorized publishing. Committing locally ≠ publishing.
+
+**Push is authorized when the user clearly asks to publish**, including shorthand such as:
+`push`, `commit and push`, `close, commit, push`, `ship it`, or `publish`. That authorization
+covers the current unpushed batch on the branch being discussed — not a standing license for
+later sessions. If only `commit` / `close` is said, commit (and close) but **do not** push.
 
 **Prefixes (fixed where used)**
 
