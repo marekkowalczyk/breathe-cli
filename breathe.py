@@ -15,10 +15,10 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.11'
+VERSION = '1.11.1'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-28T10:01'
+RELEASED = '2026-08-28T12:20'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
@@ -301,16 +301,33 @@ def draw_progress(layout, config, elapsed):
         pad = (layout.width - BAR_WIDTH) // 2
         sys.stdout.write(' ' * pad + bar)
 
+def footer_version_stamp():
+    """Discreet VERSION · RELEASED for the session footer (no 'breathe' prefix)."""
+    return '{} \u00b7 {}'.format(VERSION, RELEASED)
+
+def format_footer_line(width, paused):
+    """Plain footer text: key hints left, version stamp right-aligned.
+
+    Drops RELEASED, then the whole stamp, before ever clipping the hints.
+    """
+    if paused:
+        hints = 'space resume \u00b7 q quit'
+    else:
+        hints = 'space pause \u00b7 s mute \u00b7 q quit'
+    left = '  ' + hints
+    for right in (footer_version_stamp(), VERSION):
+        gap = width - len(left) - len(right)
+        if gap >= 1:
+            return left + (' ' * gap) + right
+    return left
+
 def draw_footer(layout, paused):
     move_to(layout.footer_row, 1)
     sys.stdout.write(ANSI_CLR_LINE)
-    if paused:
-        text = 'space resume \u00b7 q quit'
-    else:
-        text = 'space pause \u00b7 s mute \u00b7 q quit'
+    text = format_footer_line(layout.width, paused)
     if layout.use_colour:
         text = ANSI_DIM + text + ANSI_RESET
-    sys.stdout.write('  ' + text)
+    sys.stdout.write(text)
 
 def render_frame(layout, config, elapsed, remaining_s, phase, progress,
                  paused, muted):

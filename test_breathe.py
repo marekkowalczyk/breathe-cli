@@ -63,6 +63,34 @@ class TestVersion(unittest.TestCase):
         self.assertRegex(breathe.RELEASED, r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$')
 
 
+class TestFormatFooterLine(unittest.TestCase):
+    def test_wide_terminal_right_aligns_version_and_released(self):
+        line = breathe.format_footer_line(80, paused=False)
+        self.assertTrue(line.startswith('  space pause'))
+        self.assertTrue(line.endswith(
+            '{} \u00b7 {}'.format(breathe.VERSION, breathe.RELEASED)))
+        self.assertEqual(len(line), 80)
+
+    def test_paused_hints(self):
+        line = breathe.format_footer_line(80, paused=True)
+        self.assertIn('space resume', line)
+        self.assertNotIn('mute', line)
+
+    def test_narrow_drops_stamp_before_clipping_hints(self):
+        left = '  space pause \u00b7 s mute \u00b7 q quit'
+        line = breathe.format_footer_line(len(left), paused=False)
+        self.assertEqual(line, left)
+
+    def test_medium_keeps_version_only(self):
+        left = '  space pause \u00b7 s mute \u00b7 q quit'
+        # Room for version + one space gap, but not full stamp
+        width = len(left) + 1 + len(breathe.VERSION)
+        line = breathe.format_footer_line(width, paused=False)
+        self.assertTrue(line.endswith(breathe.VERSION))
+        self.assertNotIn(breathe.RELEASED, line)
+        self.assertEqual(len(line), width)
+
+
 class TestPresets(unittest.TestCase):
     def test_all_presets_at_6_bpm(self):
         for name, p in breathe.PRESETS.items():
