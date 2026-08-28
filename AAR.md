@@ -6,21 +6,22 @@ Continuous improvement log. Each session ends with a brief review: what went wel
 
 Added `-v` for `--version`, then `RELEASED` (minute-precision local datetime) beside
 `VERSION` so `breathe -v` prints `breathe {VERSION} {RELEASED}`. Documented keep-both-
-current policy in `CLAUDE.md` § Versioning. Filed [#10](https://github.com/marekkowalczyk/breathe/issues/10)
+current policy in `CLAUDE.md` § Versioning. Filed [#19](https://github.com/marekkowalczyk/breathe-cli/issues/19)
+(was private breathe#10 before the fold into public `breathe-cli`)
 for a pre-commit hook to stamp `RELEASED` mechanically (`VERSION` stays human). Tests cover
 format + `version_string()`.
 
 **What went well:**
 - **Scoped the hook as a separate issue** instead of bundling it into the versioning change
   — one-concern policy held.
-- **Policy before automation:** CLAUDE.md Versioning is the source of truth; #10 is the
+- **Policy before automation:** CLAUDE.md Versioning is the source of truth; #19 is the
   mechanical follow-through, not a substitute for the rule.
 
 **What didn't go well:**
 - Nothing material; short session.
 
 **What we'll do differently:**
-- When a value is pure wall-clock stamp, prefer filing an automation issue (#10) over
+- When a value is pure wall-clock stamp, prefer filing an automation issue (#19) over
   relying on recall alone — same disposition ladder as session-close §5.
 
 ## 2026-08-28 — Night preset + auto-night (v1.9), GitHub backlog, issue hygiene
@@ -28,8 +29,10 @@ format + `version_string()`.
 Shipped `night` preset (20 min / 3–7, Tsai-style pre-sleep 6 cpm) and `preset_for_hour`
 so bare `breathe` auto-selects night for 22:00–05:59 (fixes midnight→morning). Migrated
 `TODO.md` to GitHub Issues; strengthened one-concern policy in `CLAUDE.md` after #3 proved
-over-scoped; split deferred night UX into #8 (dim TUI) and #9 (quiet audio). 59/59 tests
-passing. `v1.9` committed but not yet tagged/released on GitHub.
+over-scoped; split deferred night UX into private #8/#9 (now public
+[#17](https://github.com/marekkowalczyk/breathe-cli/issues/17) dim TUI /
+[#18](https://github.com/marekkowalczyk/breathe-cli/issues/18) quiet audio). 59/59 tests
+passing. `v1.9` tip was later tagged/released on public `breathe-cli` (and superseded by later releases through v1.11.1).
 
 **What went well:**
 - **Science before product:** night ratio/duration locked from Tsai/Laborde evidence before
@@ -41,7 +44,8 @@ passing. `v1.9` committed but not yet tagged/released on GitHub.
 
 **What didn't go well:**
 - **#3 was filed as one issue** (preset + auto + dim + audio) — classic “and also” trap;
-  close comment alone would have lost deferred work without follow-up #8/#9.
+  close comment alone would have lost deferred work without follow-up #8/#9
+  (public #17/#18 after the fold).
 - **Accidental #1 test issue** left open from auth probing until backlog hygiene pass.
 
 **What we'll do differently:**

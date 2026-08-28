@@ -7,13 +7,14 @@ $ breathe
 
   evening · 4-6 · 14:32   [●]
 
-                INHALE
+                   IN
 
           ██████████████░░░░░░░░░░░░░░░░
 
-  space pause · s mute · q quit
+  space pause · s mute · q quit          VERSION · RELEASED
 ```
 
+Footer is dim: key hints on the left, `VERSION · RELEASED` right-aligned (same values as `breathe -v`, without the `breathe` prefix). Narrow terminals drop the stamp before clipping hints.
 ## Why this exists
 
 Resonance breathing — slow, paced breathing at around 6 breaths per minute — is one of the few non-pharmacological interventions shown to improve cardiac vagal tone. The mechanism is straightforward: slow breathing amplifies respiratory sinus arrhythmia (RSA), the natural heart-rate variation linked to the breath cycle. Stronger RSA means stronger vagal outflow, which in turn improves baroreceptor sensitivity and shifts autonomic balance away from sympathetic dominance.
@@ -53,17 +54,25 @@ This app is deliberately constrained. Several common breathing-app features are 
 
 ## Installation
 
+**Homebrew (recommended):**
+
 ```bash
-# Clone or download breathe.py, then:
-chmod +x breathe.py
-
-# Option A: run directly
-./breathe.py
-
-# Option B: symlink into your PATH
-ln -s "$(pwd)/breathe.py" /usr/local/bin/breathe
-breathe
+brew tap marekkowalczyk/breathe
+brew trust marekkowalczyk/breathe   # once — Homebrew requires tap trust
+brew install breathe
 ```
+
+Upgrade after a release: `brew upgrade breathe`.
+
+**From source** (development tip — does not replace the Homebrew binary on `PATH`):
+
+```bash
+git clone https://github.com/marekkowalczyk/breathe-cli.git
+cd breathe-cli
+python3 breathe.py -v
+```
+
+Plain `breathe` on `PATH` is the Cellar install. To smoke-test unreleased tip, run `python3 breathe.py` from the clone (see `CLAUDE.md` → Testing). Do not symlink the clone over `/opt/homebrew/bin/breathe` — that fights `brew upgrade`.
 
 ## Usage
 
@@ -161,17 +170,17 @@ During a session:
 ```
   morning · 5-5 · 09:12   [●]        <- preset, ratio, countdown, status
 
-                INHALE                <- current phase (cyan) or EXHALE (green)
+                   IN                <- current phase: IN (cyan) or OUT (green)
 
           ████████████████░░░░░░░░░░░░░░  <- breath bar (fills on inhale, drains on exhale)
 
-  space pause · s mute · q quit       <- available controls
+  space pause · s mute · q quit          VERSION · RELEASED
+                                         ^ controls (dim)     ^ tip stamp (dim, right)
 ```
 
-The status indicator shows `●` during breathing, `‖` when paused, and `🔇` when muted.
+The status indicator shows `●` during breathing, `‖` when paused, and `🔇` when muted. The footer stamp matches `VERSION` and `RELEASED` from `breathe.py` (see `-v`).
 
 The countdown timer tracks completed breathing time only. If you pause for 30 seconds during a 1-minute session, the session takes ~90 seconds of wall-clock time to complete — the timer doesn't advance while paused.
-
 ## Session logging
 
 Each session appends a row to `~/.breathe_log.csv`:

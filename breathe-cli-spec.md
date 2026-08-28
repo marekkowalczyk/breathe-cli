@@ -73,6 +73,7 @@ Manual tests, no framework required. Run in order.
 4. `breathe --list-presets` prints the preset table **and** the goal-word vocabulary (driven by `GOAL_*` maps), then exits 0.
 4a. `breathe -h` / `--help` epilog lists every goal word (`quick`/`long`, `calm`/`energize`) with effects — not only a cryptic example.
 5. `breathe -d 1` runs for ~60 seconds, renders breath animation, exits cleanly with `completed` status.
+5a. During a session on a wide enough terminal, the footer shows dim key hints on the left and a right-aligned `VERSION · RELEASED` stamp (same constants as `version_string()`, without the `breathe` prefix). On a very narrow terminal the stamp may drop entirely; hints must remain.
 6. `breathe --preset morning` starts a 10-minute 5-5 session. `Ctrl+C` during the first minute exits within 1 second and the terminal is fully usable (prompt returns on its own line, cursor visible, no leftover colour).
 6a. `breathe --preset night` starts a 20-minute 3-7 session (header shows `night · 3-7 · …`).
 6b. `breathe --list-presets` includes a `night` row (20 min, 3s-7s).
