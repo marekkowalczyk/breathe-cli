@@ -33,6 +33,17 @@ Do not add breathing patterns, retention phases, or cycle speeds not in the spec
 python3 -m unittest test_breathe -v
 ```
 
+**Released vs tip (agents: use tip for product checks):** On this machine, plain `breathe` is the **Homebrew** install (`marekkowalczyk/breathe` tap → Cellar), i.e. the last tagged release. It does **not** reflect uncommitted or untagged tip. For any CLI smoke after code changes (`-v`, `-h`, presets, safety errors, TUI), invoke the repo file — never assume PATH `breathe` is tip:
+
+```
+python3 breathe.py -v
+python3 breathe.py -h
+# or, if configured in the user's shell:
+breathe-dev -v
+```
+
+Do **not** `brew link` the clone over Cellar, and do not overwrite `/opt/homebrew/bin/breathe` with a repo symlink — that fights `brew upgrade`. After a release ships, the user upgrades with `brew upgrade breathe` (tap must be trusted: `brew trust marekkowalczyk/breathe`).
+
 **Manual acceptance tests**: the spec (§3) defines manual tests for TUI behaviour. Run them in order. Pay special attention to:
 
 - **Test 18** (terminal restoration on exception) — this validates the most critical code path.
