@@ -91,10 +91,13 @@ breathe --preset morning    # 10 min, 5s-5s
 breathe --preset midday     # 20 min, 4s-6s (full Bernardi protocol dose)
 breathe --preset evening    # 15 min, 4s-6s
 breathe --preset night      # 20 min, 3s-7s (pre-sleep calming)
-breathe --list-presets       # show the table
+breathe --list-presets       # presets + goal-word vocabulary
 ```
 
 ### Goal words
+
+Order-free shorthand when you don't want presets or raw minutes/ratios.
+Discoverable via `breathe -h` (epilog) and `breathe --list-presets`.
 
 ```bash
 breathe quick calm       # 3 min, 4-6 ratio
@@ -139,7 +142,7 @@ Duration: 1–60 minutes (rounded up to complete breath cycles). Ratio: inhale a
 | `--no-log`        |       | Don't log this session                     |
 | `--log`           |       | Print log file path and exit               |
 | `--safety`        |       | Print safety information and exit          |
-| `--list-presets`  |       | Print preset table and exit                |
+| `--list-presets`  |       | Print presets and goal words, then exit    |
 | `--version`       | `-v`  | Print version and exit                     |
 
 ### Runtime keys

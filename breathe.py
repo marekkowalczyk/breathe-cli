@@ -15,10 +15,10 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.10'
+VERSION = '1.11'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-28T09:50'
+RELEASED = '2026-08-28T10:01'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
@@ -578,6 +578,33 @@ def print_presets():
         ratio = '{}s-{}s ({:.0f} bpm)'.format(p['inhale_s'], p['exhale_s'], bpm)
         print(fmt.format(name, '{} min'.format(p['duration_min']),
                          ratio, PRESET_DESCRIPTIONS[name]))
+    print()
+    print_goal_words()
+
+def print_goal_words():
+    print(goal_words_help_text())
+
+def goal_words_help_text():
+    """Human-readable goal-word vocabulary (driven by the maps — keep in sync)."""
+    lines = [
+        'Goal words (order-free shorthand; not flags):',
+        '',
+        '  Duration — omit for default 10 min:',
+    ]
+    for word in sorted(GOAL_DURATION_WORDS, key=GOAL_DURATION_WORDS.get):
+        lines.append('    {:<10} {} min'.format(word, GOAL_DURATION_WORDS[word]))
+    lines.append('  Feel (ratio) — omit for default 5-5:')
+    for word, (inhale_s, exhale_s) in sorted(
+            GOAL_RATIO_WORDS.items(), key=lambda kv: kv[1]):
+        lines.append('    {:<10} {}-{}'.format(word, inhale_s, exhale_s))
+    lines.extend([
+        '',
+        '  Combine across axes, any order:  breathe quick calm',
+        '  Same-axis conflicts are rejected. Do not mix with --flags;',
+        '  use --duration / --ratio when you need --no-sound, etc.',
+        '  Full table: breathe --list-presets',
+    ])
+    return '\n'.join(lines)
 
 def version_string():
     """Text printed by --version / -v: semver + release datetime."""
@@ -645,14 +672,15 @@ def build_parser():
     parser = argparse.ArgumentParser(
         prog='breathe',
         description='Paced breathing for HFrEF vagal training.',
-        epilog='Example: breathe --preset morning  |  breathe quick calm',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=goal_words_help_text(),
     )
     parser.add_argument('--version', '-v', action='version',
                         version=version_string())
     parser.add_argument('--safety', action='store_true',
                         help='Show safety information and exit')
     parser.add_argument('--list-presets', action='store_true',
-                        help='Show available presets and exit')
+                        help='Show presets and goal-word shorthand, then exit')
     parser.add_argument('--preset', '-p', choices=list(PRESETS.keys()),
                         help='Use a named preset (morning, midday, evening, night)')
     parser.add_argument('--duration', '-d', type=int, metavar='MINUTES',

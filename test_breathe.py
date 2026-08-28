@@ -398,6 +398,25 @@ class TestConstants(unittest.TestCase):
         self.assertAlmostEqual(breathe.FRAME_SLEEP, 1.0 / breathe.FRAME_RATE_HZ)
 
 
+class TestGoalWordsHelp(unittest.TestCase):
+    def test_help_text_lists_every_goal_word(self):
+        text = breathe.goal_words_help_text()
+        for word in breathe.GOAL_DURATION_WORDS:
+            self.assertIn(word, text)
+        for word in breathe.GOAL_RATIO_WORDS:
+            self.assertIn(word, text)
+
+    def test_help_text_driven_by_maps(self):
+        text = breathe.goal_words_help_text()
+        self.assertIn('{} min'.format(breathe.GOAL_DURATION_WORDS['quick']), text)
+        inhale, exhale = breathe.GOAL_RATIO_WORDS['calm']
+        self.assertIn('{}-{}'.format(inhale, exhale), text)
+
+    def test_parser_epilog_is_goal_words_help(self):
+        parser = breathe.build_parser()
+        self.assertEqual(parser.epilog, breathe.goal_words_help_text())
+
+
 class TestGoalWords(unittest.TestCase):
     """try_parse_goal_words must either resolve unambiguously or fail
     loudly (SystemExit + stderr message) or return None — it must
