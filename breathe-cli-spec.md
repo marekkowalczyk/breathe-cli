@@ -68,7 +68,7 @@ Manual tests, no framework required. Run in order.
 ### 3.1 Smoke tests
 
 1. `breathe --help` prints help and exits 0.
-2. `breathe --version` and `breathe -v` print `breathe {VERSION}` (matching `breathe.py`'s `VERSION` constant) and exit 0.
+2. `breathe --version` and `breathe -v` print `breathe {VERSION} {RELEASED}` (matching `version_string()` in `breathe.py`: semver plus minute-precision local datetime) and exit 0.
 3. `breathe --safety` prints the safety block and exits 0.
 4. `breathe --list-presets` prints the preset table and exits 0.
 5. `breathe -d 1` runs for ~60 seconds, renders breath animation, exits cleanly with `completed` status.

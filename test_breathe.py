@@ -51,6 +51,18 @@ class TestConfigRatioStr(unittest.TestCase):
         self.assertEqual(c.ratio_str, '4-6')
 
 
+class TestVersion(unittest.TestCase):
+    def test_version_string_includes_semver_and_released(self):
+        s = breathe.version_string()
+        self.assertTrue(s.startswith('breathe '))
+        self.assertIn(breathe.VERSION, s)
+        self.assertIn(breathe.RELEASED, s)
+
+    def test_released_minute_precision(self):
+        # YYYY-MM-DDTHH:MM — no seconds, no timezone suffix
+        self.assertRegex(breathe.RELEASED, r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$')
+
+
 class TestPresets(unittest.TestCase):
     def test_all_presets_at_6_bpm(self):
         for name, p in breathe.PRESETS.items():

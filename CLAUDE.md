@@ -49,6 +49,29 @@ python3 -m unittest test_breathe -v
 - `duration_s` is rounded up to a whole number of `cycle_s` at config time. Never assume `duration_s == duration_min * 60` — they may differ for custom ratio/duration combinations.
 - Goal-word shorthand (`breathe quick calm`, see spec §2 C6 and §3.8): `GOAL_DURATION_WORDS` and `GOAL_RATIO_WORDS` must stay disjoint (a word ambiguous between axes is a bug, not a feature), and `try_parse_goal_words()` must never silently guess — unrecognized words, conflicting words on the same axis, or any argv mixing goal words with flags all either resolve unambiguously or fail loudly (`SystemExit` with a message, or fall through to argparse).
 
+## Versioning
+
+`breathe -v` / `--version` prints both constants from `breathe.py`:
+
+```
+breathe {VERSION} {RELEASED}
+```
+
+example: `breathe 1.9 2026-08-28T08:56`
+
+| Constant | Shape | Meaning |
+|---|---|---|
+| `VERSION` | semver (`MAJOR.MINOR.PATCH`) | Product version; bump when shipping user-visible behaviour |
+| `RELEASED` | local wall time, minute precision (`YYYY-MM-DDTHH:MM`) | When this tip was cut — **no** seconds, **no** timezone |
+
+**Keep both current — non-negotiable on ship:**
+
+1. Every commit that ships to `master` (feature, fix, or close that changes behaviour/docs users rely on) must update **`RELEASED`** to the local time of that ship.
+2. Update **`VERSION`** whenever the change is user-visible product behaviour (new preset, CLI flag, bugfix users notice). Doc-only / process-only commits may leave `VERSION` alone but still bump `RELEASED` if they are the tip being pushed.
+3. Never bump one and leave the other stale relative to the tip you are about to push: if `VERSION` moves, `RELEASED` moves in the same commit; if you push a tip, `RELEASED` matches “now”.
+4. Do **not** hardcode the version string in README/spec acceptance text — reference `VERSION` / `RELEASED` / `version_string()` (same “no derivable numbers in docs” rule).
+5. Git tags (`v1.9`) track `VERSION` only; `RELEASED` is the human-readable “when” for `-v`.
+
 ## File layout
 
 ```

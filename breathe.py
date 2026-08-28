@@ -16,6 +16,9 @@ from dataclasses import dataclass
 # ── Constants ────────────────────────────────────────────────────────
 
 VERSION = '1.9'
+# Local wall time of this release tip (minute precision). Bump with VERSION —
+# see CLAUDE.md § Versioning.
+RELEASED = '2026-08-28T09:00'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
@@ -573,6 +576,10 @@ def print_presets():
         print(fmt.format(name, '{} min'.format(p['duration_min']),
                          ratio, PRESET_DESCRIPTIONS[name]))
 
+def version_string():
+    """Text printed by --version / -v: semver + release datetime."""
+    return 'breathe {} {}'.format(VERSION, RELEASED)
+
 def preset_for_hour(hour):
     """Map local hour (0–23) to a named preset for bare `breathe` auto-select."""
     if hour >= 22 or hour <= 5:
@@ -638,7 +645,7 @@ def build_parser():
         epilog='Example: breathe --preset morning  |  breathe quick calm',
     )
     parser.add_argument('--version', '-v', action='version',
-                        version='breathe {}'.format(VERSION))
+                        version=version_string())
     parser.add_argument('--safety', action='store_true',
                         help='Show safety information and exit')
     parser.add_argument('--list-presets', action='store_true',
