@@ -27,6 +27,8 @@ This app is a habit tool that makes daily practice frictionless: open terminal, 
 - Bernardi L, Porta C, Spicuzza L, et al. ["Slow breathing increases arterial baroreflex sensitivity in patients with chronic heart failure."](https://doi.org/10.1161/hc0202.103311) *Circulation*. 2002;105(2):143-145.
 - Bernardi L, Sleight P, Bandinelli G, et al. ["Effect of rosary prayer and yoga mantras on autonomic cardiovascular rhythms."](https://doi.org/10.1136/bmj.323.7327.1446) *BMJ*. 2001;323:1446.
 - Lehrer PM, Gevirtz R. ["Heart rate variability biofeedback: how and why does it work?"](https://doi.org/10.3389/fpsyg.2014.00756) *Front Psychol*. 2014;5:756.
+- Tsai HJ, Kuo TB, Lee GS, Yang CC. ["Efficacy of paced breathing for insomnia: Enhances vagal activity and improves sleep quality."](https://doi.org/10.1111/psyp.12333) *Psychophysiology*. 2015;52(3):388-396. (pre-sleep 6 cpm, 3–7, ~20 min)
+- Laborde S, et al. ["Influence of a 30-Day Slow-Paced Breathing Intervention Compared to Social Media Use on Subjective Sleep Quality and Cardiac Vagal Activity."](https://doi.org/10.3390/jcm8020193) *J Clin Med*. 2019;8(2):193.
 
 ## Design choices
 
@@ -75,11 +77,12 @@ With no arguments, the app picks a preset based on the time of day:
 
 | Time of day  | Preset    | Duration | Ratio | BPM |
 |--------------|-----------|----------|-------|-----|
-| Before noon  | morning   | 10 min   | 5s-5s | 6   |
+| 22:00–05:59  | night     | 20 min   | 3s-7s | 6   |
+| 06:00–11:59  | morning   | 10 min   | 5s-5s | 6   |
 | 12:00–16:59  | long      | 20 min   | 4s-6s | 6   |
-| 17:00+       | evening   | 15 min   | 4s-6s | 6   |
+| 17:00–21:59  | evening   | 15 min   | 4s-6s | 6   |
 
-All presets target 6 breaths per minute. The `morning` preset uses equal inhale/exhale (5-5). The `evening` and `long` presets use a longer exhale (4-6), which emphasises vagal activation during the expiratory phase — useful for sympathetic wind-down.
+All presets target 6 breaths per minute. The `morning` preset uses equal inhale/exhale (5-5). The `evening` and `long` presets use a longer exhale (4-6) for sympathetic wind-down. The `night` preset uses a stronger exhale bias (3-7), matching the pre-sleep 6 cpm protocol studied for insomnia (Tsai et al. 2015).
 
 ### Presets
 
@@ -87,6 +90,7 @@ All presets target 6 breaths per minute. The `morning` preset uses equal inhale/
 breathe --preset morning    # 10 min, 5s-5s
 breathe --preset evening    # 15 min, 4s-6s
 breathe --preset long       # 20 min, 4s-6s (full Bernardi protocol dose)
+breathe --preset night      # 20 min, 3s-7s (pre-sleep calming)
 breathe --list-presets       # show the table
 ```
 

@@ -55,6 +55,55 @@ python3 -m unittest test_breathe -v
 breathe.py            # the app (single file)
 test_breathe.py       # automated tests (stdlib unittest)
 breathe-cli-spec.md   # safety constraints and acceptance tests
-TODO.md               # bugs and enhancements tracker
-CLAUDE.md             # this file
+CLAUDE.md             # this file (constraints + project policy)
+AAR.md                # after-action / process lessons
+NEXT-SESSION.md       # session handoff baton (not a backlog)
 ```
+
+## Tracking & handoff (GitHub Issues policy)
+
+**GitHub Issues are the only product backlog.** Bugs, enhancements, and scoped feature
+ideas live there — not in markdown trackers. There is no `TODO.md`; do not recreate one.
+
+| Artifact | Role | Put here | Do not put here |
+|---|---|---|---|
+| **GitHub Issues** | Durable product work | Bugs, enhancements, acceptance criteria, open design questions for a feature | Session diary, process tips, machine-local notes |
+| **`NEXT-SESSION.md`** | Cold-start handoff for the next agent/human | What’s blocking, decisions not to relitigate, process recall aids, **links** to open issues, current version/test state | A second copy of the backlog; issue bodies; long feature specs |
+| **`AAR.md`** | Process Of Ongoing Improvement | What went well/badly, durable process lessons (promote load-bearing ones into `CLAUDE.md`) | Open feature lists |
+
+**When opening or closing work**
+
+- New product work → file or update a GitHub Issue (`gh issue create` / comment), then link it from `NEXT-SESSION.md` Carried over if it should survive the session.
+- Session close → rewrite `NEXT-SESSION.md` (don’t append). Carried-over bullets should be **pointers to issue numbers**, not the canonical description. Prune anything already closed on GitHub.
+- Do **not** migrate `NEXT-SESSION.md` itself into Issues — handoff context (install notes, “don’t relitigate X”, smoke-test tips) is not issue-shaped.
+
+**Issue hygiene for this repo**
+
+**One issue = one concern = one shippable slice.** If an issue needs “and also”, split it before filing.
+Cross-link siblings; never merge unrelated acceptance criteria into one body.
+
+| Good (one concern) | Bad (split these) |
+|---|---|
+| Fix time-bar visibility (`draw_progress` glyphs/dim) | Fix time-bar visibility **and** add cycle-count bar |
+| `caffeinate` during session + cleanup in `finally` | Display sleep **and** dimmer night TUI |
+| Night preset: 3–7 ratio + auto-select window | Preset **and** dim UI **and** quieter audio |
+| Quieter `afplay` volume when `preset_name == 'night'` | Dimmer colours **and** quieter audio |
+
+**Filing checklist**
+
+1. **Title** — verb + single deliverable (“Prevent display sleep during session”, not “Night mode improvements”).
+2. **Problem** — one paragraph; the user-visible failure or gap.
+3. **Scope** — explicit **In** / **Out**; “Out” names sibling issues if they exist.
+4. **Acceptance** — checklist testable in one PR; no “consider” or “TBD” items (resolve or move to a design issue).
+5. **Related** — links only; no duplicate specs.
+
+**When scope grows**
+
+- **During triage:** split immediately; close the umbrella with `state_reason: not_planned` and pointers to new issues (see closed #3 → #7 lesson).
+- **Epics are discouraged.** If work is inherently multi-phase (e.g. multi-mode architecture), file a **design/scoping** issue whose *only* deliverable is a written decision + child issue list — not implementation acceptance criteria mixed in.
+- **Do not** track session handoff, process tips, or “nice to have later” as issues unless there is a concrete deliverable.
+
+**Safety & labels**
+
+- Keep safety constraints (no retention, cycle ≥ 8s, terminal restore) explicit when a change could touch them.
+- Labels: `bug` / `enhancement` as appropriate; acceptance checklists in the body when useful.

@@ -73,6 +73,8 @@ Manual tests, no framework required. Run in order.
 4. `breathe --list-presets` prints the preset table and exits 0.
 5. `breathe -d 1` runs for ~60 seconds, renders breath animation, exits cleanly with `completed` status.
 6. `breathe --preset morning` starts a 10-minute 5-5 session. `Ctrl+C` during the first minute exits within 1 second and the terminal is fully usable (prompt returns on its own line, cursor visible, no leftover colour).
+6a. `breathe --preset night` starts a 20-minute 3-7 session (header shows `night · 3-7 · …`).
+6b. `breathe --list-presets` includes a `night` row (20 min, 3s-7s).
 
 ### 3.2 Safety-rejection tests
 
@@ -100,10 +102,11 @@ Manual tests, no framework required. Run in order.
 
 ### 3.6 Time-of-day default test
 
-19. Run `breathe` with no arguments at different times of day (or mock `time.localtime`). Verify:
-    - Before noon: header shows `morning · 5-5 · 10:00 ...` (counting down)
+19. Run `breathe` with no arguments at different times of day (or call `preset_for_hour`). Verify:
+    - 22:00–05:59: header shows `night · 3-7 · 20:00 ...` (counting down)
+    - 06:00–11:59: header shows `morning · 5-5 · 10:00 ...` (counting down)
     - 12:00–16:59: header shows `long · 4-6 · 20:00 ...` (counting down)
-    - 17:00+: header shows `evening · 4-6 · 15:00 ...` (counting down)
+    - 17:00–21:59: header shows `evening · 4-6 · 15:00 ...` (counting down)
 
 ### 3.7 Session logging tests
 

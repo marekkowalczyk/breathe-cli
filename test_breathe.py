@@ -76,6 +76,29 @@ class TestPresets(unittest.TestCase):
         for name in breathe.PRESETS:
             self.assertIn(name, breathe.PRESET_DESCRIPTIONS)
 
+    def test_night_preset_tsai_protocol(self):
+        p = breathe.PRESETS['night']
+        self.assertEqual(
+            (p['duration_min'], p['inhale_s'], p['exhale_s']),
+            (20, 3, 7),
+        )
+
+
+class TestPresetForHour(unittest.TestCase):
+    def test_hour_mapping(self):
+        cases = [
+            (0, 'night'), (1, 'night'), (5, 'night'),
+            (6, 'morning'), (7, 'morning'), (11, 'morning'),
+            (12, 'long'), (16, 'long'),
+            (17, 'evening'), (19, 'evening'), (21, 'evening'),
+            (22, 'night'), (23, 'night'),
+        ]
+        for hour, expected in cases:
+            self.assertEqual(
+                breathe.preset_for_hour(hour), expected,
+                'hour {} should map to {}'.format(hour, expected),
+            )
+
 
 class TestParseRatio(unittest.TestCase):
     def test_valid_equal(self):

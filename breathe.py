@@ -15,16 +15,18 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.8'
+VERSION = '1.9'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
     'evening': {'duration_min': 15, 'inhale_s': 4, 'exhale_s': 6},
     'long':    {'duration_min': 20, 'inhale_s': 4, 'exhale_s': 6},
+    'night':   {'duration_min': 20, 'inhale_s': 3, 'exhale_s': 7},
 }
 
 PRESET_DESCRIPTIONS = {'morning': 'Daily baseline', 'evening': 'Sympathetic wind-down',
-                       'long': 'Full dose, Bernardi protocol'}
+                       'long': 'Full dose, Bernardi protocol',
+                       'night': 'Pre-sleep calming'}
 
 # Goal words: an order-free shorthand alongside --preset/-d/-r, e.g.
 # `breathe quick calm`. Each word sets one axis; axes are independent
@@ -89,7 +91,7 @@ class Config:
     duration_s: int
     inhale_s: int
     exhale_s: int
-    preset_name: str       # 'morning', 'evening', 'long', or 'custom'
+    preset_name: str       # 'morning', 'evening', 'long', 'night', or 'custom'
     sound_enabled: bool
     quiet: bool
 
@@ -571,6 +573,16 @@ def print_presets():
         print(fmt.format(name, '{} min'.format(p['duration_min']),
                          ratio, PRESET_DESCRIPTIONS[name]))
 
+def preset_for_hour(hour):
+    """Map local hour (0–23) to a named preset for bare `breathe` auto-select."""
+    if hour >= 22 or hour <= 5:
+        return 'night'
+    if hour < 12:
+        return 'morning'
+    if hour < 17:
+        return 'long'
+    return 'evening'
+
 # ── CLI parsing & validation ─────────────────────────────────────────
 # parse_ratio and try_parse_goal_words are pure logic (unit-tested) that
 # call _die on invalid input, so a bad SystemExit is loud, not silent.
@@ -632,7 +644,7 @@ def build_parser():
     parser.add_argument('--list-presets', action='store_true',
                         help='Show available presets and exit')
     parser.add_argument('--preset', '-p', choices=list(PRESETS.keys()),
-                        help='Use a named preset (morning, evening, long)')
+                        help='Use a named preset (morning, evening, long, night)')
     parser.add_argument('--duration', '-d', type=int, metavar='MINUTES',
                         help='Session duration in minutes (1\u201360, default: 10)')
     parser.add_argument('--ratio', '-r', metavar='IN-EX',
@@ -692,13 +704,7 @@ def main():
                 duration_min = args.duration
         else:
             # No args: auto-select preset by time of day
-            hour = time.localtime().tm_hour
-            if hour < 12:
-                preset_name = 'morning'
-            elif hour < 17:
-                preset_name = 'long'
-            else:
-                preset_name = 'evening'
+            preset_name = preset_for_hour(time.localtime().tm_hour)
             p = PRESETS[preset_name]
             inhale_s, exhale_s = p['inhale_s'], p['exhale_s']
             duration_min = p['duration_min']
