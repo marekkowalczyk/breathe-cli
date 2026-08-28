@@ -12,7 +12,7 @@ Auto-select (v1.10): bare `breathe` maps 22:00–05:59 → `night`, 06–11 → 
 
 ## Immediate
 
-Nothing blocking. Optional: tag/release `v1.10` on GitHub; implement [#10](https://github.com/marekkowalczyk/breathe/issues/10) (RELEASED pre-commit hook).
+Nothing blocking. Run `./scripts/suggest-release.sh` — if it reports a release due, tag+`gh release create` only after the user authorizes a release. Optional: implement [#10](https://github.com/marekkowalczyk/breathe/issues/10) (RELEASED pre-commit hook).
 
 ## Completed last session
 
@@ -45,5 +45,6 @@ Pointers only — canonical detail is on each issue:
 - **When to open an issue** — file first if scope can fork or must survive the session; skip for one-commit obvious fixes.
 - **Commits** — atomic, imperative subjects, why in the body; **commit each finished chunk without waiting to be asked**. **Push** only when the user authorizes publish (`push`, `ship it`, `close, commit, push`, …) — that covers the current unpushed batch, not later sessions. See `CLAUDE.md` § Commits.
 - **Versioning:** `RELEASED` with product/`VERSION` bumps; prefer [#10](https://github.com/marekkowalczyk/breathe/issues/10) once hooked.
+- **Releases:** after `VERSION` bumps / on session close, run `./scripts/suggest-release.sh` (see `CLAUDE.md` § Releases). Never auto-tag.
 - **Smoke-test CLI non-TTY with `-d 1`**, never default duration.
 - **Don't restate derivable numbers in docs** — reference `VERSION` / `RELEASED` / tests.

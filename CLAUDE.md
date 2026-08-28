@@ -72,6 +72,20 @@ example: `breathe 1.10 2026-08-28T09:50`
 4. Do **not** hardcode the version string in README/spec acceptance text — reference `VERSION` / `RELEASED` / `version_string()` (same “no derivable numbers in docs” rule).
 5. Git tags (`v1.10`) track `VERSION` only; `RELEASED` is the human-readable “when” for `-v`.
 
+## Releases
+
+Tag + GitHub Release track `VERSION` (`v{VERSION}`). **Suggest only — never auto-tag or `gh release create` without explicit user authorization to publish a release.**
+
+After product commits that bump `VERSION`, and on session close, run:
+
+```
+./scripts/suggest-release.sh
+```
+
+- If `VERSION` is ahead of the latest `v*` tag, surface the script’s suggestion in chat and (on close) under NEXT-SESSION **Immediate**.
+- If tags match, no action.
+- Creating the tag/release still requires the user to authorize a release publish (same spirit as push authorization).
+
 ## Commits
 
 **One commit = one concern** — same spirit as one issue = one concern. Prefer a short series of
@@ -108,12 +122,13 @@ later sessions. If only `commit` / `close` is said, commit (and close) but **do 
 ## File layout
 
 ```
-breathe.py            # the app (single file)
-test_breathe.py       # automated tests (stdlib unittest)
-breathe-cli-spec.md   # safety constraints and acceptance tests
-CLAUDE.md             # this file (constraints + project policy)
-AAR.md                # after-action / process lessons
-NEXT-SESSION.md       # session handoff baton (not a backlog)
+breathe.py                 # the app (single file)
+test_breathe.py            # automated tests (stdlib unittest)
+breathe-cli-spec.md        # safety constraints and acceptance tests
+CLAUDE.md                  # this file (constraints + project policy)
+AAR.md                     # after-action / process lessons
+NEXT-SESSION.md            # session handoff baton (not a backlog)
+scripts/suggest-release.sh # VERSION vs latest v* tag; suggest tag+release only
 ```
 
 ## Tracking & handoff (GitHub Issues policy)
