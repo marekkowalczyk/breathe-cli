@@ -87,13 +87,13 @@ example: `breathe 1.10 2026-08-28T09:50`
 
 Tag + GitHub Release track `VERSION` (`v{VERSION}`). **Suggest only — never auto-tag or `gh release create` without explicit user authorization to publish a release.**
 
-After product commits that bump `VERSION`, and on session close, run:
+After product commits that bump `VERSION`, after any other **significant** product ship (user-visible tip ahead of the latest tag), and on session close, run:
 
 ```
 ./scripts/suggest-release.sh
 ```
 
-- If `VERSION` is ahead of the latest `v*` tag, surface the script’s suggestion in chat and (on close) under NEXT-SESSION **Immediate**.
+- If `VERSION` is ahead of the latest `v*` tag, **propose a release in chat right away** (tag + `gh release create` + Homebrew formula bump) — do not wait for session close. Also note it under NEXT-SESSION **Immediate** on close if still unreleased.
 - If tags match, no action.
 - Creating the tag/release still requires the user to authorize a release publish (same spirit as push authorization).
 - **Docs audit before close** after a fold, release, or user-visible TUI/CLI change: check `README.md` and the [`homebrew-breathe`](https://github.com/marekkowalczyk/homebrew-breathe) tap README against tip (presets, install/`brew trust`, display chrome). Do not wait for the user to ask whether docs are current.
