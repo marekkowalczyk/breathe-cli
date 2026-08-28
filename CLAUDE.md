@@ -57,7 +57,7 @@ python3 -m unittest test_breathe -v
 breathe {VERSION} {RELEASED}
 ```
 
-example: `breathe 1.9 2026-08-28T08:56`
+example: `breathe 1.10 2026-08-28T09:50`
 
 | Constant | Shape | Meaning |
 |---|---|---|
@@ -66,11 +66,31 @@ example: `breathe 1.9 2026-08-28T08:56`
 
 **Keep both current — non-negotiable on ship:**
 
-1. Every commit that ships to `master` (feature, fix, or close that changes behaviour/docs users rely on) must update **`RELEASED`** to the local time of that ship.
-2. Update **`VERSION`** whenever the change is user-visible product behaviour (new preset, CLI flag, bugfix users notice). Doc-only / process-only commits may leave `VERSION` alone but still bump `RELEASED` if they are the tip being pushed.
-3. Never bump one and leave the other stale relative to the tip you are about to push: if `VERSION` moves, `RELEASED` moves in the same commit; if you push a tip, `RELEASED` matches “now”.
+1. Every **product** commit that ships to `master` (user-visible behaviour) updates **`RELEASED`** in the same commit as any **`VERSION`** bump.
+2. Update **`VERSION`** whenever the change is user-visible product behaviour (new preset, CLI flag, bugfix users notice).
+3. A short atomic series may stamp `RELEASED` on the product commit; a following process-only commit in the same push need not re-touch `breathe.py`. Before push, the tip’s `breathe -v` must still show a `RELEASED` that matches the ship wall-clock (± a few minutes).
 4. Do **not** hardcode the version string in README/spec acceptance text — reference `VERSION` / `RELEASED` / `version_string()` (same “no derivable numbers in docs” rule).
-5. Git tags (`v1.9`) track `VERSION` only; `RELEASED` is the human-readable “when” for `-v`.
+5. Git tags (`v1.10`) track `VERSION` only; `RELEASED` is the human-readable “when” for `-v`.
+
+## Commits
+
+**One commit = one concern** — same spirit as one issue = one concern. Prefer a short series of
+atomic commits over one bundled ball.
+
+| Do | Don't |
+|---|---|
+| One logical change per commit (rename **or** policy **or** close) | Mix product behaviour with constitution edits “while we’re here” |
+| Imperative subject ≤ ~72 chars (“Rename preset long to midday”) | Vague subjects (“updates”, “wip”, “fix stuff”, “misc”) |
+| Body explains **why** (1–3 lines) when the why isn’t obvious | Body that restates the diff or lists every file |
+| Match / cite a GH issue when the work was issue-tracked | Stuff five issues into one commit message |
+| Split when `git diff --stat` shows unrelated clusters | Squash unrelated work to “save” commit count |
+
+**Prefixes (fixed where used)**
+
+- `close:` — session-close artifacts only (`AAR.md` / `NEXT-SESSION.md`, maybe a tiny policy promote).
+- No other required prefixes; plain imperative is the default.
+
+**Before `git commit`:** scan the staged set — if you need “and also” in the subject, unstage and split.
 
 ## File layout
 
@@ -94,11 +114,33 @@ ideas live there — not in markdown trackers. There is no `TODO.md`; do not rec
 | **`NEXT-SESSION.md`** | Cold-start handoff for the next agent/human | What’s blocking, decisions not to relitigate, process recall aids, **links** to open issues, current version/test state | A second copy of the backlog; issue bodies; long feature specs |
 | **`AAR.md`** | Process Of Ongoing Improvement | What went well/badly, durable process lessons (promote load-bearing ones into `CLAUDE.md`) | Open feature lists |
 
-**When opening or closing work**
+**When to open an issue (before coding)**
 
-- New product work → file or update a GitHub Issue (`gh issue create` / comment), then link it from `NEXT-SESSION.md` Carried over if it should survive the session.
-- Session close → rewrite `NEXT-SESSION.md` (don’t append). Carried-over bullets should be **pointers to issue numbers**, not the canonical description. Prune anything already closed on GitHub.
-- Do **not** migrate `NEXT-SESSION.md` itself into Issues — handoff context (install notes, “don’t relitigate X”, smoke-test tips) is not issue-shaped.
+Issues are for durable product work — **not** a ticket for every keystroke. Prefer filing
+**before** implementation when any of these hold; otherwise ship and mention in the session
+close / AAR if useful.
+
+| Open an issue first when… | Skip the issue when… |
+|---|---|
+| Scope could grow (“and also”, open design forks) | One short commit, no open questions |
+| Work should survive this session / cold-start handoff | Typo, flag alias, doc sync with code just shipped |
+| Acceptance criteria or safety touchpoints matter | Pure process/doc edits to `CLAUDE.md` / AAR / NEXT-SESSION |
+| You’re choosing among approaches worth recording | Rename/reorder already decided in chat (optional issue *after* for history) |
+| Deferred slice of a larger idea (sibling of a closed umbrella) | Accidental / probe noise (close `not_planned`, don’t backlog it) |
+
+**Rule of thumb:** if you’d write more than half a page of plan, or the work could become two
+PRs, file first (one concern each). If you’d finish in one obvious commit, just ship — don’t
+replace under-scoping with issue theater.
+
+**Lifecycle**
+
+1. **Open** — follow the filing checklist below; link siblings; one concern only.
+2. **Implement** — stay inside **In**; if scope grows, split a new issue before coding the extra.
+3. **Close** — on ship (`completed`); comment with version/`RELEASED` tip if useful. Umbrellas that
+   were split → `not_planned` with pointers (see #3 → #8/#9).
+4. **Handoff** — surviving open work appears in `NEXT-SESSION.md` as **issue links only**.
+
+Do **not** migrate `NEXT-SESSION.md` itself into Issues — handoff context is not issue-shaped.
 
 **Issue hygiene for this repo**
 
@@ -122,9 +164,14 @@ Cross-link siblings; never merge unrelated acceptance criteria into one body.
 
 **When scope grows**
 
-- **During triage:** split immediately; close the umbrella with `state_reason: not_planned` and pointers to new issues (see closed #3 → #7 lesson).
+- **During triage:** split immediately; close the umbrella with `state_reason: not_planned` and pointers to new issues (see closed #3 → #7/#8/#9 lesson).
 - **Epics are discouraged.** If work is inherently multi-phase (e.g. multi-mode architecture), file a **design/scoping** issue whose *only* deliverable is a written decision + child issue list — not implementation acceptance criteria mixed in.
 - **Do not** track session handoff, process tips, or “nice to have later” as issues unless there is a concrete deliverable.
+
+**Session close**
+
+- Rewrite `NEXT-SESSION.md` (don’t append). Carried-over = **pointers to open issue numbers** only; prune closed ones.
+- Promote durable process lessons into `CLAUDE.md` (this file), not only into the AAR.
 
 **Safety & labels**
 

@@ -8,17 +8,16 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 Installed on this machine: `breathe` symlinked at `/opt/homebrew/bin/breathe` → repo's `breathe.py`, so `git pull` updates the installed command with no reinstall step.
 
-Auto-select (v1.9): bare `breathe` maps 22:00–05:59 → `night` (20 min / 3–7), 06–11 → morning, 12–16 → long, 17–21 → evening. `breathe -v` prints `VERSION` + `RELEASED` (see `CLAUDE.md` § Versioning).
+Auto-select (v1.10): bare `breathe` maps 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midday`, 17–21 → `evening`. Preset names are chronological time-of-day; goal-word `long` still means 20 min duration. `breathe -v` prints `VERSION` + `RELEASED`.
 
 ## Immediate
 
-Nothing blocking. Optional: tag/release `v1.9` on GitHub; implement [#10](https://github.com/marekkowalczyk/breathe/issues/10) (RELEASED pre-commit hook).
+Nothing blocking. Optional: tag/release `v1.10` on GitHub; implement [#10](https://github.com/marekkowalczyk/breathe/issues/10) (RELEASED pre-commit hook).
 
 ## Completed last session
 
-- ~~`-v` short for `--version`~~
-- ~~`RELEASED` + Versioning policy~~ — `breathe -v` → `breathe {VERSION} {RELEASED}`; keep-both-current in `CLAUDE.md`
-- ~~Filed [#10](https://github.com/marekkowalczyk/breathe/issues/10)~~ — pre-commit stamp for `RELEASED` only
+- ~~Rename preset `long` → `midday`; chronological preset order~~
+- ~~Issue-opening policy + atomic commit policy~~ — `CLAUDE.md` Tracking & handoff / Commits
 
 ## Carried over
 
@@ -37,12 +36,14 @@ Pointers only — canonical detail is on each issue:
 | | |
 |---|---|
 | Tests | `python3 -m unittest test_breathe -q` |
-| Version | `breathe -v` (semver + RELEASED) |
+| Version | `breathe -v` |
 | Backlog | GitHub Issues |
 
 ## Process notes
 
-- **One issue = one shippable slice** — see `CLAUDE.md`.
-- **Versioning:** bump `RELEASED` on every ship tip; bump `VERSION` for user-visible product changes; prefer [#10](https://github.com/marekkowalczyk/breathe/issues/10) once hooked.
+- **One issue = one shippable slice; one commit = one concern** — see `CLAUDE.md`.
+- **When to open an issue** — file first if scope can fork or must survive the session; skip for one-commit obvious fixes.
+- **Commits** — atomic, imperative subjects, why in the body; split unrelated `git diff --stat` clusters.
+- **Versioning:** `RELEASED` with product/`VERSION` bumps; prefer [#10](https://github.com/marekkowalczyk/breathe/issues/10) once hooked.
 - **Smoke-test CLI non-TTY with `-d 1`**, never default duration.
 - **Don't restate derivable numbers in docs** — reference `VERSION` / `RELEASED` / tests.
