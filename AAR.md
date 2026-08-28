@@ -2,6 +2,27 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-28 (morning) — Version string + RELEASED policy; `-v` short flag
+
+Added `-v` for `--version`, then `RELEASED` (minute-precision local datetime) beside
+`VERSION` so `breathe -v` prints `breathe {VERSION} {RELEASED}`. Documented keep-both-
+current policy in `CLAUDE.md` § Versioning. Filed [#10](https://github.com/marekkowalczyk/breathe/issues/10)
+for a pre-commit hook to stamp `RELEASED` mechanically (`VERSION` stays human). Tests cover
+format + `version_string()`.
+
+**What went well:**
+- **Scoped the hook as a separate issue** instead of bundling it into the versioning change
+  — one-concern policy held.
+- **Policy before automation:** CLAUDE.md Versioning is the source of truth; #10 is the
+  mechanical follow-through, not a substitute for the rule.
+
+**What didn't go well:**
+- Nothing material; short session.
+
+**What we'll do differently:**
+- When a value is pure wall-clock stamp, prefer filing an automation issue (#10) over
+  relying on recall alone — same disposition ladder as session-close §5.
+
 ## 2026-08-28 — Night preset + auto-night (v1.9), GitHub backlog, issue hygiene
 
 Shipped `night` preset (20 min / 3–7, Tsai-style pre-sleep 6 cpm) and `preset_for_hour`
