@@ -2,6 +2,32 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-28 — Night preset + auto-night (v1.9), GitHub backlog, issue hygiene
+
+Shipped `night` preset (20 min / 3–7, Tsai-style pre-sleep 6 cpm) and `preset_for_hour`
+so bare `breathe` auto-selects night for 22:00–05:59 (fixes midnight→morning). Migrated
+`TODO.md` to GitHub Issues; strengthened one-concern policy in `CLAUDE.md` after #3 proved
+over-scoped; split deferred night UX into #8 (dim TUI) and #9 (quiet audio). 59/59 tests
+passing. `v1.9` committed but not yet tagged/released on GitHub.
+
+**What went well:**
+- **Science before product:** night ratio/duration locked from Tsai/Laborde evidence before
+  coding; only distinct 6 bpm option at stronger E-bias is 3–7.
+- **#3 lesson applied quickly:** user flagged over-broad scoping; policy rewritten with
+  examples and checklist; #7 split same session instead of letting compound issues linger.
+- **Pure helper for auto-select:** `preset_for_hour()` is unit-tested — no wall-clock
+  dependency in tests.
+
+**What didn't go well:**
+- **#3 was filed as one issue** (preset + auto + dim + audio) — classic “and also” trap;
+  close comment alone would have lost deferred work without follow-up #8/#9.
+- **Accidental #1 test issue** left open from auth probing until backlog hygiene pass.
+
+**What we'll do differently:**
+- **One issue = one shippable slice** — promoted to `CLAUDE.md` (loaded every session).
+  Split before filing; close umbrellas with pointers. Epics only as design/scoping issues (#6
+  reframed).
+
 ## 2026-07-29 — Goal-word shorthand, v1.8 release, pure/impure section headers
 
 Two commits since the last close: goal-word shorthand (`breathe quick calm`, order-free,
