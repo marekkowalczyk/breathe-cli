@@ -34,12 +34,12 @@ All named presets keep a **10-second cycle → 6 breaths/min**. What changes is 
 
 | Preset | Duration | Ratio (in–ex) | Intent | Literature anchor |
 |--------|----------|---------------|--------|-------------------|
-| `morning` | 10 min | 5–5 | Equal phases; daily baseline | General ~6 bpm resonance / RSA practice |
-| `midday` | 20 min | 4–6 | Longer exhale; full session dose | Slow-breathing CHF protocols (Bernardi); “full dose” in app copy |
-| `evening` | 15 min | 4–6 | Sympathetic wind-down | Same 4–6 shape as midday, shorter wall time |
-| `night` | 20 min | 3–7 | Stronger exhale bias before sleep | Pre-sleep paced 6 cpm work on sleep / vagal activity (Tsai; Laborde) |
+| `morning` | 10 min | 5–5 | Equal phases; daily baseline | Habit-sized morning bout; acute RSA/baroreflex effects appear within a short paced session |
+| `midday` | 20 min | 4–6 | Longer exhale; main daytime train | Within the common ~15–20 min training-bout band; CHF home device-guided work is often ~15 min × 2/day (this app runs one session per invoke) |
+| `evening` | 15 min | 4–6 | Sympathetic wind-down | Matches common single-session CHF / evening slow-breathing length (e.g. Laborde 15 min) |
+| `night` | 20 min | 3–7 | Stronger exhale bias before sleep | Tsai 2015 pre-sleep 6 cpm, 3–7, ~20 min |
 
-Custom sessions and goal words (`calm` → 4–6, `energize` → 5–5) stay inside the same slow-breathing envelope: each phase 3–10 s, **total cycle ≥ 8 s**.
+Goal-word feel axis (same ratios, duration chosen separately): `train` → 5–5, `calm` → 4–6, `sleep` → 3–7. Custom sessions stay inside the same envelope: each phase 3–10 s, **total cycle ≥ 8 s**.
 
 ## Safety physiology (why the app refuses some patterns)
 
@@ -67,3 +67,5 @@ Stop immediately if you feel lightheadedness, palpitations, or tingling in the h
 - Laborde S, et al. [Influence of a 30-Day Slow-Paced Breathing Intervention Compared to Social Media Use on Subjective Sleep Quality and Cardiac Vagal Activity.](https://doi.org/10.3390/jcm8020193) *J Clin Med*. 2019;8(2):193. — Multi-week slow breathing, sleep, and cardiac vagal activity.
 
 ← [Back to Breathe CLI](https://marekkowalczyk.github.io/breathe-cli/)
+
+Personal project by [Marek Kowalczyk](https://orcid.org/0009-0008-3874-6736).
