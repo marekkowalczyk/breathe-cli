@@ -1,5 +1,10 @@
 # Breathe CLI
 
+[![PyPI](https://img.shields.io/pypi/v/breathe-cli)](https://pypi.org/project/breathe-cli/)
+[![Homebrew](https://img.shields.io/badge/homebrew-tap-orange)](https://github.com/marekkowalczyk/homebrew-breathe)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Show HN](https://img.shields.io/badge/Show%20HN-discussion-orange)](https://news.ycombinator.com/item?id=48340315)
+
 A terminal app that paces resonance breathing for vagal tone training. macOS only, single file, no dependencies.
 
 ```
@@ -55,6 +60,14 @@ brew install breathe
 ```
 
 Upgrade after a release: `brew upgrade breathe`.
+
+**PyPI:**
+
+```bash
+pip install breathe-cli
+```
+
+Upgrade after a release: `pip install -U breathe-cli`. Still macOS-only (uses `afplay`).
 
 **From source** (development tip — does not replace the Homebrew binary on `PATH`):
 
