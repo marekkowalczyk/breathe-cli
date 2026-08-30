@@ -2,6 +2,24 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-30 (evening) — PyPI publish path, README install/badges, HN park #28, GitHub MCP
+
+Caught PyPI stuck behind tip; shipped Trusted Publishing (`publish.yml`) + version-sync check; README gained `pip install breathe-cli` and badges (PyPI / Homebrew / MIT / Show HN). Audited Show HN thread — no must-create product issues; parked HRV biofeedback as [#28](https://github.com/marekkowalczyk/breathe-cli/issues/28). Wired Cursor GitHub MCP via `open -a Cursor --env GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token)"` (read/write verified). Measured: 77 tests OK; tip `breathe 1.13.0 2026-08-30T21:02`; VERSION matches tag; unpushed work exists (README + this close).
+
+**What went well:**
+- **Install channels documented together** — Homebrew recommended, PyPI present, live version badge — closes the discoverability gap that left pip at 1.9.
+- **HN triage stayed disciplined** — mapped themes to existing issues; only durable new idea filed (#28); no necro status dump on the thread.
+- **MCP diagnosis before rabbit hole** — PAT existed via `gh` keyring but Cursor never saw it; `--env` relaunch fixed it without inventing a second token.
+
+**What didn't go well:**
+- **PyPI lag unnoticed for months** until this session — GitHub/Homebrew had a release habit; pip did not.
+- **GitHub MCP 403/timeouts** looked like “auth broken” when the real failure was under-scoped / unset `GITHUB_PERSONAL_ACCESS_TOKEN` in the Cursor process; `gh` still worked, which masked the split.
+
+**What we'll do differently:**
+- **Releases always include the PyPI path** — already in `CLAUDE.md` § Releases (Trusted Publishing); confirm Actions green before claiming pip is updated. (AAR reinforces; no new CLAUDE edit.)
+- **Cursor GitHub MCP:** launch with `GITHUB_PERSONAL_ACCESS_TOKEN` in the process env (`open -a Cursor --env …="$(gh auth token)"`); do not assume `gh` keyring auth is enough. **Process note** in NEXT-SESSION (machine-local; not promoted to CLAUDE).
+- **HN:** no top-level necro updates on old Show HN threads; optional reply under a specific ask only. **AAR only.**
+
 ## 2026-08-30 — Science page, feel-axis, v1.13.0, homebrew/core milestone; proper close
 
 Published `/science/` + session-summary URL; ORCID on science/`_config.yml`. Feel-axis → `train`/`calm`/`sleep` (retired `energize`); preset durations kept; midday “Bernardi full dose” claim dropped. Closed #20. Parked GUI as #22 (macOS+Windows only). Shipped **v1.13.0** + Homebrew bump. Opened milestone [homebrew/core](https://github.com/marekkowalczyk/breathe-cli/milestone/1) with #23–#27. First wrap-up was housekeeping-only; user caught the missing proper session-close — this entry completes it. Measured: 77 tests OK; tip `breathe 1.13.0 2026-08-30T21:02`; tag matches; unpushed 0.
