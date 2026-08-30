@@ -181,6 +181,8 @@ During a session:
 The status indicator shows `●` during breathing, `‖` when paused, and `🔇` when muted. The footer stamp matches `VERSION` and `RELEASED` from `breathe.py` (see `-v`).
 
 The countdown timer tracks completed breathing time only. If you pause for 30 seconds during a 1-minute session, the session takes ~90 seconds of wall-clock time to complete — the timer doesn't advance while paused.
+
+During an interactive session the display stays awake (macOS / Windows / Linux best-effort, no dependencies). Normal dimming and screensaver return when the session ends. If stay-awake cannot be acquired, a calm stderr line appears before the TUI (hidden by `--quiet`) and the summary adds a short Note.
 ## Session logging
 
 Each session appends a row to `~/.breathe_log.csv`:

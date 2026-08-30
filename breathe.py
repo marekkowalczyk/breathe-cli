@@ -15,10 +15,10 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.11.1'
+VERSION = '1.12.0'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-28T12:20'
+RELEASED = '2026-08-30T18:54'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
@@ -111,6 +111,7 @@ class Result:
     elapsed: float = 0.0
     completed: bool = False
     aborted: bool = False
+    wake_unavailable: bool = False
 
 @dataclass
 class Layout:
@@ -193,6 +194,88 @@ def play_sound(phase, audio_mode):
     elif audio_mode == 'bell':
         sys.stdout.write('\a')
         sys.stdout.flush()
+
+# ── Display stay-awake (impure — OS idle inhibit) ───────────────────
+# Handle: ('caffeinate'|'systemd', Popen) | ('win32', None) | None
+# ES_* values match Win32 SetThreadExecutionState.
+
+_ES_CONTINUOUS = 0x80000000
+_ES_DISPLAY_REQUIRED = 0x00000002
+
+def _notify_wake_unavailable(quiet):
+    if not quiet:
+        sys.stderr.write(
+            'display stay-awake unavailable: screen may sleep during session\n'
+        )
+
+def _acquire_darwin():
+    proc = subprocess.Popen(
+        ['/usr/bin/caffeinate', '-d', '-w', str(os.getpid())],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return ('caffeinate', proc)
+
+def _acquire_win32():
+    import ctypes
+    flags = _ES_CONTINUOUS | _ES_DISPLAY_REQUIRED
+    if ctypes.windll.kernel32.SetThreadExecutionState(flags) == 0:
+        raise OSError('SetThreadExecutionState failed')
+    return ('win32', None)
+
+def _acquire_linux():
+    proc = subprocess.Popen(
+        [
+            'systemd-inhibit',
+            '--what=idle:sleep',
+            '--who=breathe',
+            '--why=session',
+            '--mode=block',
+            'sleep', 'infinity',
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    if proc.poll() is not None:
+        raise OSError('systemd-inhibit exited immediately')
+    return ('systemd', proc)
+
+def acquire_display_wake(quiet):
+    """Hold a display-idle assertion for the session. Returns handle or None."""
+    try:
+        if sys.platform == 'darwin':
+            return _acquire_darwin()
+        if sys.platform == 'win32':
+            return _acquire_win32()
+        if sys.platform.startswith('linux'):
+            return _acquire_linux()
+    except (OSError, AttributeError):
+        pass
+    _notify_wake_unavailable(quiet)
+    return None
+
+def release_display_wake(handle):
+    """Drop the display-idle assertion. Idempotent; never raises."""
+    if not handle:
+        return
+    kind, payload = handle
+    try:
+        if kind in ('caffeinate', 'systemd') and payload is not None:
+            payload.terminate()
+            try:
+                payload.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                try:
+                    payload.kill()
+                except OSError:
+                    pass
+            except OSError:
+                pass
+        elif kind == 'win32':
+            import ctypes
+            ctypes.windll.kernel32.SetThreadExecutionState(_ES_CONTINUOUS)
+    except (OSError, AttributeError):
+        pass
 
 # ── Terminal raw-mode / key polling (impure) ────────────────────────
 
@@ -399,8 +482,13 @@ def run_session(config, result):
     _abort[0] = False
 
     muted = not config.sound_enabled
+    wake = None
 
     try:
+        wake = acquire_display_wake(config.quiet)
+        if wake is None:
+            result.wake_unavailable = True
+
         sys.stdout.write(ANSI_HIDE_CUR)
         sys.stdout.write(ANSI_CLEAR)
         sys.stdout.flush()
@@ -526,6 +614,7 @@ def run_session(config, result):
         result.elapsed = breathing_base
 
     finally:
+        release_display_wake(wake)
         sys.stdout.write(ANSI_SHOW_CUR)
         sys.stdout.write(ANSI_RESET)
         move_to(layout.footer_row + 2, 1)
@@ -542,16 +631,26 @@ def _completion(config, result):
 
 # ── Summary, logging, and info-mode output (impure) ──────────────────
 
-def print_summary(config, result):
+def format_summary_lines(config, result):
+    """Pure summary lines (unit-tested). Includes wake Note when needed."""
     label = config.preset_name if config.preset_name != 'custom' else 'custom'
     target = '{} min ({}, {})'.format(config.duration_s // 60, label, config.ratio_str)
     pct, status = _completion(config, result)
-    print('Session summary')
-    print('\u2500' * 15)
-    print('Target:    {}'.format(target))
-    print('Completed: {} ({}%)'.format(format_human(result.elapsed), pct))
-    print('Breaths:   {} full cycles'.format(result.breaths))
-    print('Status:    {}'.format(status))
+    lines = [
+        'Session summary',
+        '\u2500' * 15,
+        'Target:    {}'.format(target),
+        'Completed: {} ({}%)'.format(format_human(result.elapsed), pct),
+        'Breaths:   {} full cycles'.format(result.breaths),
+        'Status:    {}'.format(status),
+    ]
+    if result.wake_unavailable:
+        lines.append('Note:      display stay-awake was unavailable')
+    return lines
+
+def print_summary(config, result):
+    for line in format_summary_lines(config, result):
+        print(line)
 
 def log_session(config, result, session_start_time):
     """Append one CSV row to ~/.breathe_log.csv. Never raises."""

@@ -91,6 +91,7 @@ Manual tests, no framework required. Run in order.
 12. `breathe -d 1 | cat` (non-TTY stdout) prints a warning, runs for 60 seconds, and prints a summary — without an animated frame loop.
 13. Rename `/usr/bin/afplay` temporarily (or `chmod -x`), run `breathe -d 1`: startup warns about audio fallback, session runs, bell is heard at phase transitions.
 14. Repeat test 13 with `breathe --quiet -d 1`: no startup warning is printed, session runs normally with bell fallback.
+14a. Display stay-awake: during an interactive session, display idle sleep is inhibited (macOS `caffeinate -d`, Windows `SetThreadExecutionState`, Linux `systemd-inhibit` when available). After exit via `q`, Ctrl+C, completion, or Test 18's forced exception, no `caffeinate` / `systemd-inhibit` child remains and normal idle behaviour returns. If acquire fails: stderr shows `display stay-awake unavailable: screen may sleep during session` (suppressed by `--quiet`), and the summary includes `Note: display stay-awake was unavailable`.
 
 ### 3.4 Runtime-control tests
 
@@ -100,7 +101,7 @@ Manual tests, no framework required. Run in order.
 
 ### 3.5 Terminal-restoration test
 
-18. Inject a deliberate `raise RuntimeError('boom')` inside the render loop. Run the app. Confirm: summary prints, then traceback, then prompt returns on its own line with cursor visible and no lingering colour codes.
+18. Inject a deliberate `raise RuntimeError('boom')` inside the render loop. Run the app. Confirm: summary prints, then traceback, then prompt returns on its own line with cursor visible and no lingering colour codes. Also confirm no stranded display-wake child (`caffeinate` / `systemd-inhibit`) after the crash path — same `finally` as terminal restore.
 
 ### 3.6 Time-of-day default test
 

@@ -218,6 +218,26 @@ class TestCompletion(unittest.TestCase):
         self.assertEqual(pct, 100)
 
 
+class TestSummaryLines(unittest.TestCase):
+    def test_no_wake_note_by_default(self):
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
+        r = breathe.Result(breaths=60, elapsed=600.0, completed=True)
+        lines = breathe.format_summary_lines(c, r)
+        self.assertEqual(lines[-1], 'Status:    completed')
+        self.assertFalse(any('stay-awake' in line for line in lines))
+
+    def test_wake_unavailable_note(self):
+        c = breathe.Config(600, 5, 5, 'morning', True, False)
+        r = breathe.Result(breaths=60, elapsed=600.0, completed=True,
+                           wake_unavailable=True)
+        lines = breathe.format_summary_lines(c, r)
+        self.assertEqual(
+            lines[-1],
+            'Note:      display stay-awake was unavailable',
+        )
+        self.assertEqual(lines[-2], 'Status:    completed')
+
+
 class TestBreathingBase(unittest.TestCase):
     """Verify breathing_base is always an exact multiple of cycle_s."""
 
