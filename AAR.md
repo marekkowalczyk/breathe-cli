@@ -2,6 +2,26 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-30 (late) — Display stay-awake (#13); PATH vs tip; hold release for manual test
+
+Designed and shipped session-scoped display-idle inhibit in `breathe.py` (cross-platform stdlib: macOS `caffeinate`, Windows `SetThreadExecutionState`, Linux `systemd-inhibit`), with calm acquire-failure notices. [#13](https://github.com/marekkowalczyk/breathe-cli/issues/13) closed. Tip later moved to **v1.13.0** (other sessions); feature is on current tip. Measured this close: 77 tests OK; `python3 breathe.py -v` and PATH `breathe -v` both `1.13.0 2026-08-30T21:02`; VERSION sync OK; unpushed 0.
+
+**What went well:**
+- **Kept stdlib / single-file** — OS backends behind acquire/release; no wake library; failure never aborts the session.
+- **Failure UX matched soft-fail tone** — stderr like audio fallback + summary `Note:`; `--quiet` suppresses the startup line.
+- **User held release for manual test** — correct gate before tag; later evening tip/brew already at 1.13.0 with the feature in history.
+
+**What didn't go well:**
+- **User correction — PATH `breathe` still showed 1.11.1** while tip was 1.12.0. Install split is documented, but the agent did not remind at the moment of the VERSION bump / “test this” handoff.
+- Workspace root was missing `repos/breathe`; real clone is `breathe-cli` (same as earlier today).
+- GitHub MCP could not comment/close #13 from this agent (403); issue closed by another path.
+
+**What we'll do differently:**
+- **Recurring (2nd):** PATH Cellar vs tip. After any tip `VERSION` bump (and before asking the user to “try it”), say once: smoke with `python3 breathe.py -v`, not PATH `breathe`. Already in `CLAUDE.md` § Testing — **reinforce as process note** (chat habit), not a new CLAUDE section.
+- Prefer `~/repos/breathe-cli` as Cursor root for product work (AAR only — situational).
+
+---
+
 ## 2026-08-30 (evening) — PyPI publish path, README install/badges, HN park #28, GitHub MCP
 
 Caught PyPI stuck behind tip; shipped Trusted Publishing (`publish.yml`) + version-sync check; README gained `pip install breathe-cli` and badges (PyPI / Homebrew / MIT / Show HN). Audited Show HN thread — no must-create product issues; parked HRV biofeedback as [#28](https://github.com/marekkowalczyk/breathe-cli/issues/28). Wired Cursor GitHub MCP via `open -a Cursor --env GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token)"` (read/write verified). Measured: 77 tests OK; tip `breathe 1.13.0 2026-08-30T21:02`; VERSION matches tag; unpushed work exists (README + this close).

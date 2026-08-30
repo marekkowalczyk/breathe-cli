@@ -14,13 +14,12 @@ Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midd
 
 ## Completed last session
 
-- Trusted Publishing workflow + `check-version-sync.sh`; README PyPI install + badges (PyPI / Homebrew / MIT / Show HN).
-- Show HN audit → parked [#28](https://github.com/marekkowalczyk/breathe-cli/issues/28) (HRV closed-loop); no other new issues; no HN necro update.
-- Cursor GitHub MCP wired via process env PAT (`gh auth token`); smoke create/close #29.
+- Display stay-awake during interactive sessions (cross-platform stdlib backends + calm failure notices). Closed [#13](https://github.com/marekkowalczyk/breathe-cli/issues/13). Spec test 14a + Test 18 note.
+- User held tag/release until manual test; tip/brew later at v1.13.0 with the feature on history. Reminder: PATH `breathe` ≠ tip until Cellar catches up.
 
 ## Immediate
 
-Unpushed commits exist — **push when authorized** (README + close artifacts). Then next product slice: **#23** (Linux vs macOS-only for homebrew/core). Lightest UX otherwise: #14.
+Nothing blocking. Next product slice: **#23** (Linux vs macOS-only for homebrew/core), or lightest UX **#14**. Optional: manually confirm display does not dim during a long tip session (Energy Saver aggressive).
 
 ## Carried over
 
@@ -55,6 +54,7 @@ Community issues (#4–#11 linux/golang/etc.) unchanged.
 
 ## Process notes
 
+- **After a tip VERSION bump:** remind once to smoke with `python3 breathe.py -v` / `python3 breathe.py …`, not PATH `breathe` (Cellar lags until release + brew upgrade). See `CLAUDE.md` § Testing.
 - **Wrap-up → session-close skill** — see `CLAUDE.md` § Session close. Housekeeping ship ≠ close.
 - **No live URL until remote has the tip** — see `CLAUDE.md` § Releases.
 - **PyPI:** GitHub Release → `publish.yml` (Trusted Publishing); confirm Actions green before claiming `pip` is updated. Keep `VERSION` ↔ `pyproject.toml` in sync (`./scripts/check-version-sync.sh`).
