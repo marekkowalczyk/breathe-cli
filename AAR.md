@@ -2,6 +2,21 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-30 (late+) — Name-collision note (npm / crates); push handoff
+
+README Installation now states npm [`breathe-cli`](https://www.npmjs.com/package/breathe-cli) and crates.io [`breathe`](https://crates.io/crates/breathe) are unrelated — this app is Python via Homebrew/PyPI. Measured: 77 tests OK; tip/brew `1.13.0`; nothing to release.
+
+**What went well:**
+- **One calm sentence under install** — enough to stop wrong-registry installs without a comparison table.
+
+**What didn't go well:**
+- Nothing material; small doc follow-through after the user flagged the npm collide (and earlier the Rust one).
+
+**What we'll do differently:**
+- When a same-name package appears on another registry, add a README “not the same project” line at install time — do not wait for a support ticket. **Process note.**
+
+---
+
 ## 2026-08-30 (late) — Display stay-awake (#13); PATH vs tip; hold release for manual test
 
 Designed and shipped session-scoped display-idle inhibit in `breathe.py` (cross-platform stdlib: macOS `caffeinate`, Windows `SetThreadExecutionState`, Linux `systemd-inhibit`), with calm acquire-failure notices. [#13](https://github.com/marekkowalczyk/breathe-cli/issues/13) closed. Tip later moved to **v1.13.0** (other sessions); feature is on current tip. Measured this close: 77 tests OK; `python3 breathe.py -v` and PATH `breathe -v` both `1.13.0 2026-08-30T21:02`; VERSION sync OK; unpushed 0.

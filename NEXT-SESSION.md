@@ -14,12 +14,12 @@ Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midd
 
 ## Completed last session
 
-- Display stay-awake during interactive sessions (cross-platform stdlib backends + calm failure notices). Closed [#13](https://github.com/marekkowalczyk/breathe-cli/issues/13). Spec test 14a + Test 18 note.
-- User held tag/release until manual test; tip/brew later at v1.13.0 with the feature on history. Reminder: PATH `breathe` ≠ tip until Cellar catches up.
+- Display stay-awake (#13) + calm failure notices; PATH-vs-tip reminder reinforced.
+- README: npm `breathe-cli` and crates.io `breathe` are **not** this project (Python / Homebrew / PyPI only).
 
 ## Immediate
 
-Nothing blocking. Next product slice: **#23** (Linux vs macOS-only for homebrew/core), or lightest UX **#14**. Optional: manually confirm display does not dim during a long tip session (Energy Saver aggressive).
+Nothing blocking. Next product slice: **#23** (Linux vs macOS-only for homebrew/core), or lightest UX **#14**.
 
 ## Carried over
 
@@ -54,6 +54,7 @@ Community issues (#4–#11 linux/golang/etc.) unchanged.
 
 ## Process notes
 
+- **Same-name on another registry:** add a README “Not the same project” line under Installation promptly.
 - **After a tip VERSION bump:** remind once to smoke with `python3 breathe.py -v` / `python3 breathe.py …`, not PATH `breathe` (Cellar lags until release + brew upgrade). See `CLAUDE.md` § Testing.
 - **Wrap-up → session-close skill** — see `CLAUDE.md` § Session close. Housekeeping ship ≠ close.
 - **No live URL until remote has the tip** — see `CLAUDE.md` § Releases.
