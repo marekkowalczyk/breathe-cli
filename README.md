@@ -69,6 +69,8 @@ pip install breathe-cli
 
 Upgrade after a release: `pip install -U breathe-cli`. Still macOS-only (uses `afplay`).
 
+**Not the same project:** unrelated packages reuse similar names on other registries — e.g. the npm [`breathe-cli`](https://www.npmjs.com/package/breathe-cli) and the crates.io [`breathe`](https://crates.io/crates/breathe) crate. This app is Python-only; install via Homebrew or PyPI as above.
+
 **From source** (development tip — does not replace the Homebrew binary on `PATH`):
 
 ```bash
