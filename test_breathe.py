@@ -223,7 +223,9 @@ class TestSummaryLines(unittest.TestCase):
         c = breathe.Config(600, 5, 5, 'morning', True, False)
         r = breathe.Result(breaths=60, elapsed=600.0, completed=True)
         lines = breathe.format_summary_lines(c, r)
-        self.assertEqual(lines[-1], 'Status:    completed')
+        self.assertEqual(lines[-3], 'Status:    completed')
+        self.assertEqual(lines[-2], '')
+        self.assertEqual(lines[-1], 'Science:  {}'.format(breathe.SCIENCE_URL))
         self.assertFalse(any('stay-awake' in line for line in lines))
 
     def test_wake_unavailable_note(self):
@@ -232,10 +234,19 @@ class TestSummaryLines(unittest.TestCase):
                            wake_unavailable=True)
         lines = breathe.format_summary_lines(c, r)
         self.assertEqual(
-            lines[-1],
+            lines[-4],
+            'Status:    completed',
+        )
+        self.assertEqual(
+            lines[-3],
             'Note:      display stay-awake was unavailable',
         )
-        self.assertEqual(lines[-2], 'Status:    completed')
+        self.assertEqual(lines[-2], '')
+        self.assertEqual(lines[-1], 'Science:  {}'.format(breathe.SCIENCE_URL))
+
+    def test_science_url_constant(self):
+        self.assertTrue(breathe.SCIENCE_URL.startswith('https://'))
+        self.assertIn('/science/', breathe.SCIENCE_URL)
 
 
 class TestBreathingBase(unittest.TestCase):

@@ -18,7 +18,10 @@ from dataclasses import dataclass
 VERSION = '1.12.0'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-30T19:02'
+RELEASED = '2026-08-30T20:21'
+
+# GitHub Pages science explainer (shown under session summary).
+SCIENCE_URL = 'https://marekkowalczyk.github.io/breathe-cli/science/'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
@@ -646,11 +649,17 @@ def format_summary_lines(config, result):
     ]
     if result.wake_unavailable:
         lines.append('Note:      display stay-awake was unavailable')
+    lines.append('')
+    lines.append('Science:  {}'.format(SCIENCE_URL))
     return lines
 
 def print_summary(config, result):
+    use_colour = supports_colour()
     for line in format_summary_lines(config, result):
-        print(line)
+        if use_colour and line.startswith('Science:'):
+            print(ANSI_DIM + line + ANSI_RESET)
+        else:
+            print(line)
 
 def log_session(config, result, session_start_time):
     """Append one CSV row to ~/.breathe_log.csv. Never raises."""

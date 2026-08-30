@@ -17,19 +17,11 @@ $ breathe
 Footer is dim: key hints on the left, `VERSION · RELEASED` right-aligned (same values as `breathe -v`, without the `breathe` prefix). Narrow terminals drop the stamp before clipping hints.
 ## Why this exists
 
-Resonance breathing — slow, paced breathing at around 6 breaths per minute — is one of the few non-pharmacological interventions shown to improve cardiac vagal tone. The mechanism is straightforward: slow breathing amplifies respiratory sinus arrhythmia (RSA), the natural heart-rate variation linked to the breath cycle. Stronger RSA means stronger vagal outflow, which in turn improves baroreceptor sensitivity and shifts autonomic balance away from sympathetic dominance.
+Resonance breathing — slow, paced breathing at around 6 breaths per minute — amplifies respiratory sinus arrhythmia (RSA) and engages cardiac vagal pathways. That matters especially in HFrEF / CHF, where sympathetic overdrive worsens disease; clinical slow-breathing work (e.g. Bernardi) motivates a daily habit tool, not a medical device.
 
-This matters most for people with heart failure with reduced ejection fraction (HFrEF), where sympathetic overdrive is both a symptom and an accelerant of disease progression. Bernardi et al. demonstrated that slow breathing at 6 bpm improves oxygen saturation and exercise tolerance in CHF patients, with effects visible after a single session and cumulative benefits over weeks of daily practice.
+Open a terminal, run `breathe`, follow the bar.
 
-This app is a habit tool that makes daily practice frictionless: open terminal, run `breathe`, follow the bar. It is not a medical device.
-
-### Key references
-
-- Bernardi L, Porta C, Spicuzza L, et al. ["Slow breathing increases arterial baroreflex sensitivity in patients with chronic heart failure."](https://doi.org/10.1161/hc0202.103311) *Circulation*. 2002;105(2):143-145.
-- Bernardi L, Sleight P, Bandinelli G, et al. ["Effect of rosary prayer and yoga mantras on autonomic cardiovascular rhythms."](https://doi.org/10.1136/bmj.323.7327.1446) *BMJ*. 2001;323:1446.
-- Lehrer PM, Gevirtz R. ["Heart rate variability biofeedback: how and why does it work?"](https://doi.org/10.3389/fpsyg.2014.00756) *Front Psychol*. 2014;5:756.
-- Tsai HJ, Kuo TB, Lee GS, Yang CC. ["Efficacy of paced breathing for insomnia: Enhances vagal activity and improves sleep quality."](https://doi.org/10.1111/psyp.12333) *Psychophysiology*. 2015;52(3):388-396. (pre-sleep 6 cpm, 3–7, ~20 min)
-- Laborde S, et al. ["Influence of a 30-Day Slow-Paced Breathing Intervention Compared to Social Media Use on Subjective Sleep Quality and Cardiac Vagal Activity."](https://doi.org/10.3390/jcm8020193) *J Clin Med*. 2019;8(2):193.
+**[The science behind Breathe CLI](science.md)** — mechanism, preset ↔ literature map, safety physiology, and the full annotated bibliography (canonical references live there so they do not drift from this README).
 
 ## Design choices
 
