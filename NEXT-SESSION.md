@@ -22,12 +22,18 @@ Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midd
 
 ## Immediate
 
-Nothing blocking. Next product slices from Carried over (#14 progress bar visibility is the lightest UX win).
+Nothing blocking. Active track: [homebrew/core milestone](https://github.com/marekkowalczyk/breathe-cli/milestone/1) (#23–#27). Lightest UX win otherwise remains #14.
 
 ## Carried over
 
 Pointers only:
 
+- **[Milestone: homebrew/core](https://github.com/marekkowalczyk/breathe-cli/milestone/1)** — official Homebrew core install
+  - [GH #23](https://github.com/marekkowalczyk/breathe-cli/issues/23) — decide Linux vs macOS-only for core
+  - [GH #24](https://github.com/marekkowalczyk/breathe-cli/issues/24) — choose formula token (`breathe` vs `breathe-cli`)
+  - [GH #25](https://github.com/marekkowalczyk/breathe-cli/issues/25) — prepare formula for `brew audit --new --strict`
+  - [GH #26](https://github.com/marekkowalczyk/breathe-cli/issues/26) — submit homebrew/core PR
+  - [GH #27](https://github.com/marekkowalczyk/breathe-cli/issues/27) — post-merge: version bumps + tap deprecation
 - [GH #14](https://github.com/marekkowalczyk/breathe-cli/issues/14) — time progress bar visibility
 - [GH #15](https://github.com/marekkowalczyk/breathe-cli/issues/15) — cycle-count progress bar
 - [GH #16](https://github.com/marekkowalczyk/breathe-cli/issues/16) — design: scope multi-mode
