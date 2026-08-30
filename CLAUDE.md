@@ -97,6 +97,7 @@ After product commits that bump `VERSION`, after any other **significant** produ
 - If tags match, no action.
 - Creating the tag/release still requires the user to authorize a release publish (same spirit as push authorization).
 - **Docs audit before close** after a fold, release, or user-visible TUI/CLI change: check `README.md` and the [`homebrew-breathe`](https://github.com/marekkowalczyk/homebrew-breathe) tap README against tip (presets, install/`brew trust`, display chrome). Do not wait for the user to ask whether docs are current.
+- **No live URL or install claim until the serving remote has the tip.** Do not tell the user a GitHub Pages path, release URL, or `brew install`/`upgrade` path is ready until the commit (and Pages rebuild, if applicable) is on the remote that serves it. Claiming `/science/` before push caused a user-visible 404 (2026-08-30); same class as docs lagging the ship (2026-08-28).
 
 ## Commits
 
@@ -210,8 +211,15 @@ Cross-link siblings; never merge unrelated acceptance criteria into one body.
 
 **Session close**
 
+When the user signals wrap-up (“close”, “done for today”, “archive this session”, “that’s a wrap”, etc.), **run the session-close skill** (global `session-close`, unless a project-local skill replaces/overlays it). Do **not** treat push/tag/Homebrew alone as a close.
+
+Required outcomes:
+
 - Rewrite `NEXT-SESSION.md` (don’t append). Carried-over = **pointers to open issue numbers** only; prune closed ones.
+- AAR entry with user corrections named; recurrence labelled; lessons dispositioned.
 - Promote durable process lessons into `CLAUDE.md` (this file), not only into the AAR.
+- `close:` commit for close artifacts (+ tiny policy promotes). Push only if authorized.
+- Baton pass **in chat**: next action, blockers, promotions made.
 
 **Safety & labels**
 

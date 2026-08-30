@@ -2,22 +2,25 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
-## 2026-08-30 — Science page, feel-axis redesign, ship v1.13.0
+## 2026-08-30 — Science page, feel-axis, v1.13.0, homebrew/core milestone; proper close
 
-Published `/science/` on GitHub Pages with clinician-adjacent explainer + ORCID; CLI session summary links there. Redesigned feel-axis goal words to `train`/`calm`/`sleep` (retired `energize`); kept preset durations; fixed midday “Bernardi full dose” overclaim. Closed [#20](https://github.com/marekkowalczyk/breathe-cli/issues/20). Parked GUI idea as [#22](https://github.com/marekkowalczyk/breathe-cli/issues/22) (macOS + Windows only). Housekeeping-only close: push + **v1.13.0** + Homebrew bump; no further product slices tonight. 77 tests OK.
+Published `/science/` + session-summary URL; ORCID on science/`_config.yml`. Feel-axis → `train`/`calm`/`sleep` (retired `energize`); preset durations kept; midday “Bernardi full dose” claim dropped. Closed #20. Parked GUI as #22 (macOS+Windows only). Shipped **v1.13.0** + Homebrew bump. Opened milestone [homebrew/core](https://github.com/marekkowalczyk/breathe-cli/milestone/1) with #23–#27. First wrap-up was housekeeping-only; user caught the missing proper session-close — this entry completes it. Measured: 77 tests OK; tip `breathe 1.13.0 2026-08-30T21:02`; tag matches; unpushed 0.
 
 **What went well:**
-- **Science page as canonical bibliography** avoided README/science drift; ORCID attached where it was missing.
-- **Feel-axis kept, words fixed** — research-aligned without dropping the 2-axis model; loud retirement of `energize`.
-- **Duration review stayed honest** — kept 10/20/15/20 with rationale instead of churning numbers for citation cosplay.
+- **Science page as canonical bibliography** stopped README/science citation drift; ORCID attached where it was missing.
+- **Feel-axis kept, words fixed** — research-aligned without dropping the model; loud retirement of `energize`.
+- **Duration review stayed honest** — kept 10/20/15/20 with rationale instead of citation cosplay.
+- **Milestone for homebrew/core** (not one mega-issue) matched one-concern policy; GUI stayed a parked idea.
 
 **What didn't go well:**
-- Science page 404 until commit/push — tip was live in the agent’s head before Pages had the file.
-- Workspace path started as missing `repos/breathe`; real work is `breathe-cli`.
+- **User correction — science 404:** agent told the user `/science/` was the live URL before `science.md` was committed/pushed.
+- **User correction — incomplete close:** asked whether a proper session close had been done; housekeeping AAR/NEXT existed but skill §§4–5/§9 (recurrence, promotion, baton) were skipped until they asked.
+- Workspace opened on missing `repos/breathe`; real clone is `breathe-cli`.
 
 **What we'll do differently:**
-- After adding a Pages path referenced from the CLI, **push before telling the user the URL is live**.
-- Prefer opening the correct clone (`breathe-cli`) before product work when the Cursor root is stale.
+- **Recurring (2nd):** publish-before-reporting. 2026-08-28 was docs lag until the user asked “are docs up to date?”; today was claiming a Pages URL before push. **Promoted → `CLAUDE.md` § Releases** (no live URL / install claim until tip is on the remote that serves it).
+- **Run the session-close skill on wrap-up** (user asked to remember). **Promoted → `CLAUDE.md` § Session close** — housekeeping ship ≠ close; baton pass in chat required.
+- Prefer opening `~/repos/breathe-cli` before product work when Cursor root is stale (AAR only — situational).
 
 ## 2026-08-28 — Fold private into public breathe-cli; brew path; footer stamp
 
