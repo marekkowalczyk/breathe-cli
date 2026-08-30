@@ -18,7 +18,7 @@ from dataclasses import dataclass
 VERSION = '1.12.0'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-30T18:54'
+RELEASED = '2026-08-30T19:02'
 
 PRESETS = {
     'morning': {'duration_min': 10, 'inhale_s': 5, 'exhale_s': 5},
