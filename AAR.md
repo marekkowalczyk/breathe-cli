@@ -2,6 +2,22 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-30 (late++) — Roadmap candidates park; close + push
+
+Philosophy-aligned roadmap brainstorm against open Issues / README / spec; saved as `ROADMAP-CANDIDATES.md` for later one-concern issue filing (not a second backlog). Measured: 77 tests OK; tip/brew `1.13.0 2026-08-30T21:02`; VERSION sync OK; nothing to release.
+
+**What went well:**
+- **Candidates file, not Issues yet** — brainstorm stays durable without flooding the backlog or recreating `TODO.md`; convert when ready (one concern each).
+- **Anti-roadmap called out** — config/accounts/holds/BLE-in-file explicitly out of scope, so later filing stays filtered.
+
+**What didn't go well:**
+- Nothing material; short planning session.
+
+**What we'll do differently:**
+- When a multi-slice roadmap brainstorm is worth keeping but not ready to file: park in `ROADMAP-CANDIDATES.md` (or delete after filing), never in `NEXT-SESSION.md` as a backlog dump. **Process note.**
+
+---
+
 ## 2026-08-30 (late+) — Name-collision note (npm / crates); push handoff
 
 README Installation now states npm [`breathe-cli`](https://www.npmjs.com/package/breathe-cli) and crates.io [`breathe`](https://crates.io/crates/breathe) are unrelated — this app is Python via Homebrew/PyPI. Measured: 77 tests OK; tip/brew `1.13.0`; nothing to release.

@@ -14,17 +14,17 @@ Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midd
 
 ## Completed last session
 
-- Display stay-awake (#13) + calm failure notices; PATH-vs-tip reminder reinforced.
-- README: npm `breathe-cli` and crates.io `breathe` are **not** this project (Python / Homebrew / PyPI only).
+- Parked philosophy-aligned roadmap brainstorm in [`ROADMAP-CANDIDATES.md`](ROADMAP-CANDIDATES.md) for later issue conversion (not Issues yet).
 
 ## Immediate
 
-Nothing blocking. Next product slice: **#23** (Linux vs macOS-only for homebrew/core), or lightest UX **#14**.
+Nothing blocking. Optional: convert selected items from `ROADMAP-CANDIDATES.md` into Issues (suggested first: `doctor`, opt-in `say`, man page, named safety rejections, science literature refresh). Else next product slice: **#23** (Linux vs macOS-only for homebrew/core), or lightest UX **#14**.
 
 ## Carried over
 
 Pointers only:
 
+- **Candidates → Issues later:** [`ROADMAP-CANDIDATES.md`](ROADMAP-CANDIDATES.md) (delete or prune after filing)
 - **[Milestone: homebrew/core](https://github.com/marekkowalczyk/breathe-cli/milestone/1)**
   - [GH #23](https://github.com/marekkowalczyk/breathe-cli/issues/23) — Linux vs macOS-only
   - [GH #24](https://github.com/marekkowalczyk/breathe-cli/issues/24) — formula token
@@ -51,9 +51,11 @@ Community issues (#4–#11 linux/golang/etc.) unchanged.
 | Tip version | `python3 breathe.py -v` |
 | Brew release | `breathe -v` |
 | Backlog | GitHub Issues / [homebrew/core milestone](https://github.com/marekkowalczyk/breathe-cli/milestone/1) |
+| Roadmap park | `ROADMAP-CANDIDATES.md` (not Issues) |
 
 ## Process notes
 
+- **Roadmap brainstorm park:** multi-slice ideas worth keeping but not ready to file → `ROADMAP-CANDIDATES.md`; convert to one-concern Issues later; prune/delete the file after. Do not dump into NEXT-SESSION as a backlog.
 - **Same-name on another registry:** add a README “Not the same project” line under Installation promptly.
 - **After a tip VERSION bump:** remind once to smoke with `python3 breathe.py -v` / `python3 breathe.py …`, not PATH `breathe` (Cellar lags until release + brew upgrade). See `CLAUDE.md` § Testing.
 - **Wrap-up → session-close skill** — see `CLAUDE.md` § Session close. Housekeeping ship ≠ close.
