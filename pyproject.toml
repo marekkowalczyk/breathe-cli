@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "breathe-cli"
-version = "1.12.0"
+version = "1.13.0"
 description = "Paced resonance breathing for vagal tone training. Single-file terminal app, no dependencies."
 readme = "README.md"
 license = "MIT"
