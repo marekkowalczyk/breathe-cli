@@ -1,0 +1,53 @@
+name: Publish to PyPI
+
+# Uploads to PyPI via Trusted Publishing when a GitHub Release is published.
+# Configure the matching publisher on https://pypi.org/manage/project/breathe-cli/settings/publishing/
+# (owner marekkowalczyk, repo breathe-cli, workflow publish.yml, environment pypi).
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check VERSION matches pyproject.toml
+        run: ./scripts/check-version-sync.sh
+
+      - name: Install build
+        run: python -m pip install --upgrade pip build
+
+      - name: Build distributions
+        run: python -m build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/breathe-cli/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -16,8 +16,10 @@ LATEST_TAG="$(git tag -l 'v*' --sort=-v:refname | head -n 1 || true)"
 if [[ -z "$LATEST_TAG" ]]; then
   echo "Release due: VERSION is $VERSION; no v* tags found."
   echo "  Suggest (after user authorizes a release):"
+  echo "    ./scripts/check-version-sync.sh"
   echo "    git tag \"v${VERSION}\" && git push origin \"v${VERSION}\""
   echo "    gh release create \"v${VERSION}\" --title \"v${VERSION}\" --generate-notes"
+  echo "  PyPI publishes automatically from the GitHub Release (workflow publish.yml)."
   exit 0
 fi
 
@@ -34,8 +36,11 @@ HIGHER="$(printf '%s\n%s\n' "$LATEST_VER" "$VERSION" | sort -V | tail -n 1)"
 if [[ "$HIGHER" == "$VERSION" ]]; then
   echo "Release due: VERSION $VERSION is ahead of latest tag $LATEST_TAG."
   echo "  Suggest (after user authorizes a release):"
+  echo "    ./scripts/check-version-sync.sh"
   echo "    git tag \"v${VERSION}\" && git push origin \"v${VERSION}\""
   echo "    gh release create \"v${VERSION}\" --title \"v${VERSION}\" --generate-notes"
+  echo "  PyPI publishes automatically from the GitHub Release (workflow publish.yml)."
+  echo "  Then bump Homebrew (marekkowalczyk/homebrew-breathe) as usual."
   exit 0
 fi
 

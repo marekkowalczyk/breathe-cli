@@ -87,6 +87,12 @@ example: `breathe 1.10 2026-08-28T09:50`
 
 Tag + GitHub Release track `VERSION` (`v{VERSION}`). **Suggest only — never auto-tag or `gh release create` without explicit user authorization to publish a release.**
 
+Keep **`VERSION` in `breathe.py` and `version` in `pyproject.toml` identical** before any release. Check with:
+
+```
+./scripts/check-version-sync.sh
+```
+
 After product commits that bump `VERSION`, after any other **significant** product ship (user-visible tip ahead of the latest tag), and on session close, run:
 
 ```
@@ -96,6 +102,7 @@ After product commits that bump `VERSION`, after any other **significant** produ
 - If `VERSION` is ahead of the latest `v*` tag, **propose a release in chat right away** (tag + `gh release create` + Homebrew formula bump) — do not wait for session close. Also note it under NEXT-SESSION **Immediate** on close if still unreleased.
 - If tags match, no action.
 - Creating the tag/release still requires the user to authorize a release publish (same spirit as push authorization).
+- **PyPI:** publishing a GitHub Release triggers [`.github/workflows/publish.yml`](.github/workflows/publish.yml) (Trusted Publishing → `pypi` environment). Do **not** run local `twine upload` for normal releases. Confirm the Actions run went green before telling the user PyPI is updated; piwheels follows PyPI on its own.
 - **Docs audit before close** after a fold, release, or user-visible TUI/CLI change: check `README.md` and the [`homebrew-breathe`](https://github.com/marekkowalczyk/homebrew-breathe) tap README against tip (presets, install/`brew trust`, display chrome). Do not wait for the user to ask whether docs are current.
 - **No live URL or install claim until the serving remote has the tip.** Do not tell the user a GitHub Pages path, release URL, or `brew install`/`upgrade` path is ready until the commit (and Pages rebuild, if applicable) is on the remote that serves it. Claiming `/science/` before push caused a user-visible 404 (2026-08-30); same class as docs lagging the ship (2026-08-28).
 
