@@ -10,31 +10,32 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 **Install split:** PATH `breathe` = Homebrew Cellar (last tag); tip = `python3 breathe.py` or `breathe-dev` (see `CLAUDE.md` → Testing). Session footer shows dim `VERSION · RELEASED` right-aligned.
 
-Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midday`, 17–21 → `evening`. Goal-word `long` = 20 min duration (unchanged). Goal-word redesign is design-only [#20](https://github.com/marekkowalczyk/breathe-cli/issues/20).
+Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midday`, 17–21 → `evening`. Goal words: duration `quick`/`long`; feel `train`/`calm`/`sleep` (5-5 / 4-6 / 3-7). Retired `energize` errors with a pointer to `train`.
 
 ## Completed last session
 
-- Folded private product into public `breathe-cli`; archived private; remapped issues #13–#20.
-- Released **v1.11** and **v1.11.1**; Homebrew formula current; docs (README / spec / tap README / AAR) synced.
-- Filed [#21](https://github.com/marekkowalczyk/breathe-cli/issues/21) (`breathe stats`) — not implemented.
+- Science GitHub Pages page (`/science/`) + session-summary URL; ORCID on science + `_config.yml`.
+- Feel-axis redesign (`train`/`calm`/`sleep`); midday label → “Main training session”; durations kept.
+- Display stay-awake during sessions (#13, earlier on tip).
+- Filed [#22](https://github.com/marekkowalczyk/breathe-cli/issues/22) — idea: native GUI (“normie”) app for **macOS + Windows** only (no Linux GUI).
+- Closed #20 (goal-word design). Released **v1.13.0**; Homebrew formula bumped.
 
 ## Immediate
 
-Nothing blocking. Pick a product slice from Carried over (e.g. [#13](https://github.com/marekkowalczyk/breathe-cli/issues/13) display sleep, or design [#20](https://github.com/marekkowalczyk/breathe-cli/issues/20) / [#16](https://github.com/marekkowalczyk/breathe-cli/issues/16)). Run `./scripts/suggest-release.sh` after any `VERSION` bump.
+Nothing blocking. Next product slices from Carried over (#14 progress bar visibility is the lightest UX win).
 
 ## Carried over
 
 Pointers only:
 
-- [GH #13](https://github.com/marekkowalczyk/breathe-cli/issues/13) — prevent display sleep during session
 - [GH #14](https://github.com/marekkowalczyk/breathe-cli/issues/14) — time progress bar visibility
 - [GH #15](https://github.com/marekkowalczyk/breathe-cli/issues/15) — cycle-count progress bar
 - [GH #16](https://github.com/marekkowalczyk/breathe-cli/issues/16) — design: scope multi-mode
 - [GH #17](https://github.com/marekkowalczyk/breathe-cli/issues/17) — night dimmer TUI
 - [GH #18](https://github.com/marekkowalczyk/breathe-cli/issues/18) — night quieter audio
 - [GH #19](https://github.com/marekkowalczyk/breathe-cli/issues/19) — pre-commit hook for `RELEASED`
-- [GH #20](https://github.com/marekkowalczyk/breathe-cli/issues/20) — design: rethink goal-word vocabulary
 - [GH #21](https://github.com/marekkowalczyk/breathe-cli/issues/21) — `breathe stats` summary from session log
+- [GH #22](https://github.com/marekkowalczyk/breathe-cli/issues/22) — idea: GUI app (macOS + Windows)
 
 Community issues on this repo (#4–#11 linux/golang/etc.) are separate and unchanged.
 
@@ -46,6 +47,7 @@ Community issues on this repo (#4–#11 linux/golang/etc.) are separate and unch
 | Tip version | `python3 breathe.py -v` |
 | Brew release | `breathe -v` |
 | Backlog | GitHub Issues on breathe-cli |
+| Science | https://marekkowalczyk.github.io/breathe-cli/science/ |
 
 ## Process notes
 

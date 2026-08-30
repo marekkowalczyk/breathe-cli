@@ -2,6 +2,23 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-30 — Science page, feel-axis redesign, ship v1.13.0
+
+Published `/science/` on GitHub Pages with clinician-adjacent explainer + ORCID; CLI session summary links there. Redesigned feel-axis goal words to `train`/`calm`/`sleep` (retired `energize`); kept preset durations; fixed midday “Bernardi full dose” overclaim. Closed [#20](https://github.com/marekkowalczyk/breathe-cli/issues/20). Parked GUI idea as [#22](https://github.com/marekkowalczyk/breathe-cli/issues/22) (macOS + Windows only). Housekeeping-only close: push + **v1.13.0** + Homebrew bump; no further product slices tonight. 77 tests OK.
+
+**What went well:**
+- **Science page as canonical bibliography** avoided README/science drift; ORCID attached where it was missing.
+- **Feel-axis kept, words fixed** — research-aligned without dropping the 2-axis model; loud retirement of `energize`.
+- **Duration review stayed honest** — kept 10/20/15/20 with rationale instead of churning numbers for citation cosplay.
+
+**What didn't go well:**
+- Science page 404 until commit/push — tip was live in the agent’s head before Pages had the file.
+- Workspace path started as missing `repos/breathe`; real work is `breathe-cli`.
+
+**What we'll do differently:**
+- After adding a Pages path referenced from the CLI, **push before telling the user the URL is live**.
+- Prefer opening the correct clone (`breathe-cli`) before product work when the Cursor root is stale.
+
 ## 2026-08-28 — Fold private into public breathe-cli; brew path; footer stamp
 
 Folded private `breathe` into public [`breathe-cli`](https://github.com/marekkowalczyk/breathe-cli) (PR #12, LICENSE kept, private product won). Migrated backlog to public #13–#20; archived private repo; local clone retargeted to `~/repos/breathe-cli`. Tagged **v1.11** then **v1.11.1**; Homebrew formula bumped both times. Documented PATH `breathe` (Cellar) vs tip (`python3 breathe.py` / `breathe-dev`). Shipped discreet footer `VERSION · RELEASED`. Filed [#21](https://github.com/marekkowalczyk/breathe-cli/issues/21) (`breathe stats`). Synced README / spec / AAR / tap README after user asked whether docs were current. 69 tests OK; tip matches tag v1.11.1.
