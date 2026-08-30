@@ -89,7 +89,7 @@ All presets target 6 breaths per minute. Names follow time of day (`morning` →
 
 ```bash
 breathe --preset morning    # 10 min, 5s-5s
-breathe --preset midday     # 20 min, 4s-6s (full Bernardi protocol dose)
+breathe --preset midday     # 20 min, 4s-6s (main training session)
 breathe --preset evening    # 15 min, 4s-6s
 breathe --preset night      # 20 min, 3s-7s (pre-sleep calming)
 breathe --list-presets       # presets + goal-word vocabulary
@@ -104,22 +104,24 @@ Discoverable via `breathe -h` (epilog) and `breathe --list-presets`.
 breathe quick calm       # 3 min, 4-6 ratio
 breathe calm quick       # same as above — order doesn't matter
 breathe quick            # 3 min, default 5-5 ratio
-breathe energize         # default 10 min, 5-5 ratio
+breathe train            # default 10 min, 5-5 ratio
+breathe long sleep       # 20 min, 3-7 ratio
 ```
 
 An order-free shorthand for people who don't want to think in minutes and
 ratios. Each word sets one independent axis:
 
-| Axis     | Words                | Effect                          |
-|----------|-----------------------|----------------------------------|
-| Duration | `quick`, `long`       | 3 min, or 20 min                |
-| Feel     | `calm`, `energize`    | 4-6 ratio, or 5-5 ratio          |
+| Axis     | Words                         | Effect                                      |
+|----------|-------------------------------|---------------------------------------------|
+| Duration | `quick`, `long`               | 3 min, or 20 min                            |
+| Feel     | `train`, `calm`, `sleep`      | 5-5, 4-6, or 3-7 ratio                      |
 
 Words can appear in any order and combine freely across axes. Two words
 for the same axis (e.g. `breathe quick long`) is rejected as an explicit
-error rather than silently picking one. Goal words don't combine with
-flags — use `--duration`/`--ratio` directly if you need `--no-sound`,
-`--quiet`, etc. alongside a custom session.
+error rather than silently picking one. The retired word `energize` fails
+with a message pointing to `train` — equal 5-5 is training, not arousal.
+Goal words don't combine with flags — use `--duration`/`--ratio` directly
+if you need `--no-sound`, `--quiet`, etc. alongside a custom session.
 
 ### Custom sessions
 

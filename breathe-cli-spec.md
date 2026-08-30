@@ -71,7 +71,7 @@ Manual tests, no framework required. Run in order.
 2. `breathe --version` and `breathe -v` print `breathe {VERSION} {RELEASED}` (matching `version_string()` in `breathe.py`: semver plus minute-precision local datetime) and exit 0.
 3. `breathe --safety` prints the safety block and exits 0.
 4. `breathe --list-presets` prints the preset table **and** the goal-word vocabulary (driven by `GOAL_*` maps), then exits 0.
-4a. `breathe -h` / `--help` epilog lists every goal word (`quick`/`long`, `calm`/`energize`) with effects — not only a cryptic example.
+4a. `breathe -h` / `--help` epilog lists every goal word (`quick`/`long`, `train`/`calm`/`sleep`) with effects — not only a cryptic example.
 5. `breathe -d 1` runs for ~60 seconds, renders breath animation, exits cleanly with `completed` status.
 5a. During a session on a wide enough terminal, the footer shows dim key hints on the left and a right-aligned `VERSION · RELEASED` stamp (same constants as `version_string()`, without the `breathe` prefix). On a very narrow terminal the stamp may drop entirely; hints must remain.
 6. `breathe --preset morning` starts a 10-minute 5-5 session. `Ctrl+C` during the first minute exits within 1 second and the terminal is fully usable (prompt returns on its own line, cursor visible, no leftover colour).

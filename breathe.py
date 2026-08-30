@@ -15,10 +15,10 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.12.0'
+VERSION = '1.13.0'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-30T20:21'
+RELEASED = '2026-08-30T21:02'
 
 # GitHub Pages science explainer (shown under session summary).
 SCIENCE_URL = 'https://marekkowalczyk.github.io/breathe-cli/science/'
@@ -32,7 +32,7 @@ PRESETS = {
 
 PRESET_DESCRIPTIONS = {
     'morning': 'Daily baseline',
-    'midday':  'Full dose, Bernardi protocol',
+    'midday':  'Main training session',
     'evening': 'Sympathetic wind-down',
     'night':   'Pre-sleep calming',
 }
@@ -41,7 +41,18 @@ PRESET_DESCRIPTIONS = {
 # `breathe quick calm`. Each word sets one axis; axes are independent
 # so any duration word may combine with any ratio word.
 GOAL_DURATION_WORDS = {'quick': 3, 'long': 20}
-GOAL_RATIO_WORDS = {'calm': (4, 6), 'energize': (5, 5)}
+GOAL_RATIO_WORDS = {
+    'train': (5, 5),   # equal phases — resonance / daily training
+    'calm':  (4, 6),   # longer exhale — settle / wind-down
+    'sleep': (3, 7),   # stronger E-bias — pre-sleep (Tsai-shaped)
+}
+# Former feel words that must fail loudly (not silently alias).
+RETIRED_GOAL_WORDS = {
+    'energize': (
+        'energize is not a goal word. Use train for equal 5-5 '
+        '(this app does not raise arousal at 6 bpm).'
+    ),
+}
 
 SOUND_INHALE = '/System/Library/Sounds/Tink.aiff'
 SOUND_EXHALE = '/System/Library/Sounds/Pop.aiff'
@@ -781,8 +792,13 @@ def try_parse_goal_words(argv):
     if not argv:
         return None
     words = [a.lower() for a in argv]
-    if not all(w in GOAL_DURATION_WORDS or w in GOAL_RATIO_WORDS for w in words):
+    known = (set(GOAL_DURATION_WORDS) | set(GOAL_RATIO_WORDS)
+             | set(RETIRED_GOAL_WORDS))
+    if not all(w in known for w in words):
         return None
+    for w in words:
+        if w in RETIRED_GOAL_WORDS:
+            _die(RETIRED_GOAL_WORDS[w])
     duration_hits = [w for w in words if w in GOAL_DURATION_WORDS]
     ratio_hits = [w for w in words if w in GOAL_RATIO_WORDS]
     if len(duration_hits) > 1:

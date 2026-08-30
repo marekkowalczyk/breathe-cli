@@ -520,6 +520,18 @@ class TestGoalWords(unittest.TestCase):
         self.assertEqual(breathe.try_parse_goal_words(['calm']),
                          (10, 4, 6, 'calm'))
 
+    def test_train_maps_to_equal_phases(self):
+        self.assertEqual(breathe.try_parse_goal_words(['train']),
+                         (10, 5, 5, 'train'))
+
+    def test_sleep_maps_to_tsai_ratio(self):
+        self.assertEqual(breathe.try_parse_goal_words(['sleep']),
+                         (10, 3, 7, 'sleep'))
+
+    def test_long_sleep(self):
+        self.assertEqual(breathe.try_parse_goal_words(['long', 'sleep']),
+                         (20, 3, 7, 'long+sleep'))
+
     def test_both_axes_resolve(self):
         self.assertEqual(breathe.try_parse_goal_words(['quick', 'calm']),
                          (3, 4, 6, 'quick+calm'))
@@ -545,9 +557,27 @@ class TestGoalWords(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stderr(buf):
             with self.assertRaises(SystemExit) as ctx:
-                breathe.try_parse_goal_words(['calm', 'energize'])
+                breathe.try_parse_goal_words(['calm', 'train'])
         self.assertEqual(ctx.exception.code, 1)
         self.assertIn('Conflicting goal words', buf.getvalue())
+
+    def test_retired_energize_raises_with_train_pointer(self):
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit) as ctx:
+                breathe.try_parse_goal_words(['energize'])
+        self.assertEqual(ctx.exception.code, 1)
+        err = buf.getvalue()
+        self.assertIn('energize', err.lower())
+        self.assertIn('train', err)
+
+    def test_retired_energize_with_duration_still_raises(self):
+        buf = io.StringIO()
+        with redirect_stderr(buf):
+            with self.assertRaises(SystemExit) as ctx:
+                breathe.try_parse_goal_words(['quick', 'energize'])
+        self.assertEqual(ctx.exception.code, 1)
+        self.assertIn('train', buf.getvalue())
 
     def test_repeated_same_word_raises(self):
         # Even a repeated (non-conflicting) word must not be silently
