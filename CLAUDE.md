@@ -14,6 +14,12 @@ Single-file Python 3 CLI app (`breathe.py`) that paces resonance breathing for H
 - **No curses**: Use direct ANSI escape codes. curses has Mojave edge cases with non-default terminals.
 - **No threading**: Use `select.select` with zero timeout for non-blocking key polling. No `threading.Thread`, no `curses.getch`.
 
+## Default invocation (omakase)
+
+**Omakase** — bare `breathe` with no argv is chef's choice, not help text and not a fixed default. Wall-clock hour → `preset_for_hour()` → named preset (`night` / `morning` / `midday` / `evening`). The pre-session countdown shows the chosen preset/duration and accepts `q` — that is the confirmation UX. Do not replace bare invocation with interactive menus, a fixed preset, or “print help and exit.” Overrides stay explicit: `--preset`, `--duration`/`--ratio`, or goal words. Revisit only if real usage shows a bad default (historically: midday’s 20 min).
+
+Naming credit: the *omakase* framing follows [David Heinemeier Hansson (DHH)](https://world.hey.com/dhh)’s [Omakase Computing](https://learn.omacom.io/3/omacom/76/omakase-computing) idea under [Omacom](https://learn.omacom.io/) (“I’ll leave it up to you” / curated defaults; substitutions always allowed). Breathe’s mapping (time-of-day → preset) is our own; we are not affiliated with Omacom.
+
 ## Safety constraints (non-negotiable)
 
 These are load-bearing design decisions, not features to be added later:

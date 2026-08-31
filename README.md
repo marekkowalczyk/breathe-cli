@@ -24,7 +24,7 @@ Footer is dim: key hints on the left, `VERSION · RELEASED` right-aligned (same 
 
 Resonance breathing — slow, paced breathing at around 6 breaths per minute — amplifies respiratory sinus arrhythmia (RSA) and engages cardiac vagal pathways. That matters especially in HFrEF / CHF, where sympathetic overdrive worsens disease; clinical slow-breathing work (e.g. Bernardi) motivates a daily habit tool, not a medical device.
 
-Open a terminal, run `breathe`, follow the bar.
+Open a terminal, run `breathe` (omakase), follow the bar.
 
 **[The science behind Breathe CLI](science.md)** — mechanism, preset ↔ literature map, safety physiology, and the full annotated bibliography (canonical references live there so they do not drift from this README).
 
@@ -43,6 +43,8 @@ This app is deliberately constrained. Several common breathing-app features are 
 **No dependencies.** Single Python file, stdlib only. Nothing to install, nothing to break. Runs on the Python that ships with macOS.
 
 **No curses.** Direct ANSI escape codes only. The curses library has edge cases with non-default terminals on macOS Mojave.
+
+**Omakase by default.** Run `breathe` with no arguments and the app picks a time-of-day preset (chef’s choice). The countdown shows what was chosen; `q` aborts before the session starts. Flags, presets, and goal words are the substitutions when you want control. The *omakase* framing follows [DHH](https://world.hey.com/dhh)’s [Omakase Computing](https://learn.omacom.io/3/omacom/76/omakase-computing) / [Omacom](https://learn.omacom.io/) — curated defaults without forbidding overrides; not affiliated.
 
 ## Requirements
 
@@ -84,13 +86,13 @@ Plain `breathe` on `PATH` is the Cellar install. To smoke-test unreleased tip, r
 
 ## Usage
 
-### No arguments — time-of-day auto-select
+### No arguments — omakase (time-of-day)
 
 ```bash
 breathe
 ```
 
-With no arguments, the app picks a preset based on the time of day:
+With no arguments, the app picks a preset based on the time of day (omakase / chef’s choice — see [Design choices](#design-choices)):
 
 | Time of day  | Preset    | Duration | Ratio | BPM |
 |--------------|-----------|----------|-------|-----|
