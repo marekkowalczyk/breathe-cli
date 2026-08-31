@@ -2,7 +2,27 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
-## 2026-08-30 (late++) — Roadmap candidates park; close + push
+## 2026-08-31 — PRs, Linux sound, omakase, v1.14.0 release
+
+Triaged open PRs (#5 closed → speculative [#30](https://github.com/marekkowalczyk/breathe-cli/issues/30); #10 superseded by tip port). Recorded macOS-primary / Linux+Windows secondary (community-only). Re-implemented Linux sound from #10 (@kenlacroix); closed #4/#6/#7/#23. Enshrined bare-`breathe` omakase in `CLAUDE.md`/README with DHH/Omacom credit. Filed [#31](https://github.com/marekkowalczyk/breathe-cli/issues/31) (opt-in menu interview). Elevator statement in README. Shipped **v1.14.0** (tag, GitHub Release, PyPI green, Homebrew bump + tap README). Measured at close: 85 tests OK; tip and PATH `breathe` both `1.14.0 2026-08-31T09:29`; VERSION sync OK; tags match; unpushed 0 before this close commit.
+
+**What went well:**
+- **Port stale community PR onto tip** instead of merging a conflicted branch — credit left intact; faster than rebase theatre.
+- **C1-hostile PR closed with a parked speculative issue (#30)** — “not for now / stays vagal” without discarding the idea or leaving a dirty PR open.
+- **User held release for Tahoe smoke** then authorized — correct gate; Cellar and tip match after brew bump.
+- **Tap README audited with the formula bump** — platform/omakase wording landed with the ship (docs-audit rule held).
+
+**What didn't go well:**
+- **User correction — Linux wanted, not deferred:** first #10 reply gated merge on #23 alone; user then said they want Linux support. Stance + tip port followed, but the first comment understated the product intent.
+- **Menu-interview issue (#31) sat as a draft** until end-of-day leftovers — original item 2 of the session opener.
+- Typed release as `v1.14.01` — agent correctly shipped `v1.14.0` to match `VERSION` (near-miss on semver drift).
+
+**What we'll do differently:**
+- When the owner states a platform intent (“I want Linux support”), update constitution + ship or schedule the port in the same decision thread — do not leave the only public signal as “blocked on homebrew/core.” **Process note.**
+- Safety-violating community PRs: close as not-planned-*for-now* + file a speculative parked issue in the same breath (pattern from #5→#30). **AAR only** (first clean occurrence).
+- Session openers with numbered lists: finish each item or park it as an Issue before the next — don’t leave “file later” drafts overnight. **Process note.**
+
+---
 
 Philosophy-aligned roadmap brainstorm against open Issues / README / spec; saved as `ROADMAP-CANDIDATES.md` for later one-concern issue filing (not a second backlog). Measured: 77 tests OK; tip/brew `1.13.0 2026-08-30T21:02`; VERSION sync OK; nothing to release.
 

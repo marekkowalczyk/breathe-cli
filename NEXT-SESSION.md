@@ -10,19 +10,17 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 **Install split:** PATH `breathe` = Homebrew Cellar (last tag); tip = `python3 breathe.py` or `breathe-dev` (see `CLAUDE.md` → Testing). Session footer shows dim `VERSION · RELEASED` right-aligned. Pip: `pip install breathe-cli` (auto-publishes from GitHub Release — see `CLAUDE.md` § Releases).
 
-**Platform:** macOS primary; Linux/Windows secondary, community-only (maintainer has neither machine). Bare `breathe` = omakase (time-of-day → preset); see `CLAUDE.md` → Default invocation (DHH / Omacom naming credit). Goal words: duration `quick`/`long`; feel `train`/`calm`/`sleep`. Science: https://marekkowalczyk.github.io/breathe-cli/science/
+**Platform:** macOS primary; Linux/Windows secondary, community-only (maintainer has neither machine; mark untested in docs only). Bare `breathe` = omakase (time-of-day → preset); see `CLAUDE.md` → Default invocation (DHH / Omacom naming credit). Goal words: duration `quick`/`long`; feel `train`/`calm`/`sleep`. Science: https://marekkowalczyk.github.io/breathe-cli/science/
 
 ## Completed last session
 
-- Platform stance + Linux sound on tip (**v1.14.0**): probe/`--sound-player`/`BREATHE_SOUND_*`, bell fallback; credit PR #10 / @kenlacroix. Closed #4, #6, #7, #23; superseded PR #10. PR #5 → speculative #30.
-- Omakase enshrined in `CLAUDE.md` + README with DHH/Omacom links.
-- Filed [#31](https://github.com/marekkowalczyk/breathe-cli/issues/31) (opt-in menu interview).
+- **v1.14.0** released: Linux sound probe (credit #10 / @kenlacroix), platform stance, omakase constitution + README, elevator statement; PyPI + Homebrew bumped.
+- PR hygiene: #5 → speculative [#30](https://github.com/marekkowalczyk/breathe-cli/issues/30); #10 superseded; closed #4/#6/#7/#23.
+- Filed [#31](https://github.com/marekkowalczyk/breathe-cli/issues/31) (opt-in menu interview; must not replace omakase).
 
 ## Immediate
 
-Nothing blocking. **v1.14.0** released (tag + GitHub Release + PyPI + Homebrew tap bump). Upgrade: `brew upgrade breathe` / `pip install -U breathe-cli`.
-
-Optional next slices: lightest UX **#14**, or homebrew/core **#24** (token) now that #23 leaned (B).
+Nothing blocking. Optional next slices: lightest UX **#14**, or homebrew/core **#24** (formula token; #23 leaned B).
 
 ## Carried over
 
@@ -53,13 +51,15 @@ Community: #8 research, #9 screenshots, #11 Go rewrite Q — unchanged.
 | | |
 |---|---|
 | Tests | `python3 -m unittest test_breathe -q` |
-| Tip version | `python3 breathe.py -v` → `1.14.0` |
-| Brew release | `breathe -v` → Cellar lags until release |
+| Tip version | `python3 breathe.py -v` |
+| Brew / PATH | `breathe -v` |
 | Backlog | GitHub Issues / [homebrew/core milestone](https://github.com/marekkowalczyk/breathe-cli/milestone/1) |
 | Roadmap park | `ROADMAP-CANDIDATES.md` (not Issues) |
 
 ## Process notes
 
+- **Owner platform intent:** if the user says they want Linux (or another platform) support, update constitution and schedule/ship the work in that thread — do not leave the only public signal as “blocked on homebrew/core.”
+- **Numbered session openers:** finish or Issue-park each item before moving on; no overnight “draft later” leftovers.
 - **Roadmap brainstorm park:** multi-slice ideas worth keeping but not ready to file → `ROADMAP-CANDIDATES.md`; convert to one-concern Issues later; prune/delete the file after. Do not dump into NEXT-SESSION as a backlog.
 - **Same-name on another registry:** add a README “Not the same project” line under Installation promptly.
 - **After a tip VERSION bump:** remind once to smoke with `python3 breathe.py -v` / `python3 breathe.py …`, not PATH `breathe` (Cellar lags until release + brew upgrade). See `CLAUDE.md` § Testing.
