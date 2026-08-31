@@ -10,23 +10,26 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 **Install split:** PATH `breathe` = Homebrew Cellar (last tag); tip = `python3 breathe.py` or `breathe-dev` (see `CLAUDE.md` → Testing). Session footer shows dim `VERSION · RELEASED` right-aligned. Pip: `pip install breathe-cli` (auto-publishes from GitHub Release — see `CLAUDE.md` § Releases).
 
-Auto-select: 22:00–05:59 → `night`, 06–11 → `morning`, 12–16 → `midday`, 17–21 → `evening`. Goal words: duration `quick`/`long`; feel `train`/`calm`/`sleep` (5-5 / 4-6 / 3-7). Retired `energize` errors with a pointer to `train`. Science: https://marekkowalczyk.github.io/breathe-cli/science/
+**Platform:** macOS primary; Linux/Windows secondary, community-only (maintainer has neither machine). Bare `breathe` = omakase (time-of-day → preset); see `CLAUDE.md` → Default invocation (DHH / Omacom naming credit). Goal words: duration `quick`/`long`; feel `train`/`calm`/`sleep`. Science: https://marekkowalczyk.github.io/breathe-cli/science/
 
 ## Completed last session
 
-- Parked philosophy-aligned roadmap brainstorm in [`ROADMAP-CANDIDATES.md`](ROADMAP-CANDIDATES.md) for later issue conversion (not Issues yet).
+- Platform stance + Linux sound on tip (**v1.14.0**): probe/`--sound-player`/`BREATHE_SOUND_*`, bell fallback; credit PR #10 / @kenlacroix. Closed #4, #6, #7, #23; superseded PR #10. PR #5 → speculative #30.
+- Omakase enshrined in `CLAUDE.md` + README with DHH/Omacom links.
+- Filed [#31](https://github.com/marekkowalczyk/breathe-cli/issues/31) (opt-in menu interview).
 
 ## Immediate
 
-Nothing blocking. Optional: convert selected items from `ROADMAP-CANDIDATES.md` into Issues (suggested first: `doctor`, opt-in `say`, man page, named safety rejections, science literature refresh). Else next product slice: **#23** (Linux vs macOS-only for homebrew/core), or lightest UX **#14**.
+**Release pending local smoke** — tip `1.14.0` is on `master`, ahead of tag `v1.13.0`. After you test tip (`python3 breathe.py -v` / short `-d 1`), authorize: tag `v1.14.0` + `gh release create` + Homebrew formula bump; then audit [homebrew-breathe](https://github.com/marekkowalczyk/homebrew-breathe) README (may still say macOS-only).
+
+Nothing else blocking. Optional next slices: lightest UX **#14**, or homebrew/core **#24** (token) now that #23 leaned (B).
 
 ## Carried over
 
 Pointers only:
 
 - **Candidates → Issues later:** [`ROADMAP-CANDIDATES.md`](ROADMAP-CANDIDATES.md) (delete or prune after filing)
-- **[Milestone: homebrew/core](https://github.com/marekkowalczyk/breathe-cli/milestone/1)**
-  - [GH #23](https://github.com/marekkowalczyk/breathe-cli/issues/23) — Linux vs macOS-only
+- **[Milestone: homebrew/core](https://github.com/marekkowalczyk/breathe-cli/milestone/1)** — #23 closed (lean B); remaining:
   - [GH #24](https://github.com/marekkowalczyk/breathe-cli/issues/24) — formula token
   - [GH #25](https://github.com/marekkowalczyk/breathe-cli/issues/25) — `brew audit --new --strict`
   - [GH #26](https://github.com/marekkowalczyk/breathe-cli/issues/26) — submit core PR
@@ -40,16 +43,18 @@ Pointers only:
 - [GH #21](https://github.com/marekkowalczyk/breathe-cli/issues/21) — `breathe stats`
 - [GH #22](https://github.com/marekkowalczyk/breathe-cli/issues/22) — idea: GUI (macOS + Windows)
 - [GH #28](https://github.com/marekkowalczyk/breathe-cli/issues/28) — idea: HRV closed-loop biofeedback (parked)
+- [GH #30](https://github.com/marekkowalczyk/breathe-cli/issues/30) — speculative 2.0 coherence / short-hold (parked)
+- [GH #31](https://github.com/marekkowalczyk/breathe-cli/issues/31) — opt-in menu interview (do not replace omakase)
 
-Community issues (#4–#11 linux/golang/etc.) unchanged.
+Community: #8 research, #9 screenshots, #11 Go rewrite Q — unchanged.
 
 ## Current state
 
 | | |
 |---|---|
 | Tests | `python3 -m unittest test_breathe -q` |
-| Tip version | `python3 breathe.py -v` |
-| Brew release | `breathe -v` |
+| Tip version | `python3 breathe.py -v` → `1.14.0` |
+| Brew release | `breathe -v` → Cellar lags until release |
 | Backlog | GitHub Issues / [homebrew/core milestone](https://github.com/marekkowalczyk/breathe-cli/milestone/1) |
 | Roadmap park | `ROADMAP-CANDIDATES.md` (not Issues) |
 
