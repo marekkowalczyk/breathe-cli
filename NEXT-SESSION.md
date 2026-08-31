@@ -14,13 +14,12 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 ## Completed last session
 
-- **v1.14.0** released: Linux sound probe (credit #10 / @kenlacroix), platform stance, omakase constitution + README, elevator statement; PyPI + Homebrew bumped.
-- PR hygiene: #5 → speculative [#30](https://github.com/marekkowalczyk/breathe-cli/issues/30); #10 superseded; closed #4/#6/#7/#23.
-- Filed [#31](https://github.com/marekkowalczyk/breathe-cli/issues/31) (opt-in menu interview; must not replace omakase).
+- Filed only (no implementation): [#32](https://github.com/marekkowalczyk/breathe-cli/issues/32) estimated finish clock; [#33](https://github.com/marekkowalczyk/breathe-cli/issues/33) time-bar behind/uneven (likely quantization).
+- Prior ship context still current: **v1.14.0** (Linux sound, omakase, elevator statement).
 
 ## Immediate
 
-Nothing blocking. Optional next slices: lightest UX **#14**, or homebrew/core **#24** (formula token; #23 leaned B).
+Nothing blocking. Optional lightest UX: **#14** (bar visibility), **#33** (progress feel / fill policy), or **#32** (finish clock — lean header `~HH:MM`).
 
 ## Carried over
 
@@ -43,6 +42,8 @@ Pointers only:
 - [GH #28](https://github.com/marekkowalczyk/breathe-cli/issues/28) — idea: HRV closed-loop biofeedback (parked)
 - [GH #30](https://github.com/marekkowalczyk/breathe-cli/issues/30) — speculative 2.0 coherence / short-hold (parked)
 - [GH #31](https://github.com/marekkowalczyk/breathe-cli/issues/31) — opt-in menu interview (do not replace omakase)
+- [GH #32](https://github.com/marekkowalczyk/breathe-cli/issues/32) — estimated session finish clock time
+- [GH #33](https://github.com/marekkowalczyk/breathe-cli/issues/33) — time progress bar behind / uneven jumps
 
 Community: #8 research, #9 screenshots, #11 Go rewrite Q — unchanged.
 
@@ -58,6 +59,8 @@ Community: #8 research, #9 screenshots, #11 Go rewrite Q — unchanged.
 
 ## Process notes
 
+- **File-only / don’t implement:** when the user says park or Issues-only, open Issues (or stop) — no code, no design-doc commit, no drive-by fixes.
+- **Unpushed at open:** if the SessionStart hook shows unpushed commits, surface them before starting new work.
 - **Owner platform intent:** if the user says they want Linux (or another platform) support, update constitution and schedule/ship the work in that thread — do not leave the only public signal as “blocked on homebrew/core.”
 - **Numbered session openers:** finish or Issue-park each item before moving on; no overnight “draft later” leftovers.
 - **Roadmap brainstorm park:** multi-slice ideas worth keeping but not ready to file → `ROADMAP-CANDIDATES.md`; convert to one-concern Issues later; prune/delete the file after. Do not dump into NEXT-SESSION as a backlog.

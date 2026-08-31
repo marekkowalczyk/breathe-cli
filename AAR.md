@@ -2,6 +2,24 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-08-31 (PM) — Finish-clock + progress-bar issues only
+
+Diagnosed session time-bar “behind / uneven” as likely `round()` + coarse `BAR_WIDTH` quantization (not countdown drift); brainstormed estimated finish clock time. **User correction:** file Issues only — do not implement. Filed [#32](https://github.com/marekkowalczyk/breathe-cli/issues/32) (finish clock) and [#33](https://github.com/marekkowalczyk/breathe-cli/issues/33) (progress feel). No product code. Measured at close: 85 tests OK; tip `1.14.0 2026-08-31T09:29`; VERSION sync OK; nothing to release; prior close commit had been sitting unpushed.
+
+**What went well:**
+- **Diagnose before filing** — suspected quantization documented in #33 so the next agent does not “fix” non-drift.
+- **One concern each** — finish clock and progress feel as sibling Issues, cross-linked to #14/#15.
+
+**What didn't go well:**
+- **User correction — “Only file as issues; don't do anything with them.”** Scope lock was clear; agent had been in design mode and needed the hard stop made explicit.
+- Previous session’s `close:` commit was still unpushed at this session’s start (publish lag).
+
+**What we'll do differently:**
+- When the user says file-only / park / don’t implement: open Issues (or refuse product edits) and stop — no design-doc commit, no code, no “while we’re here.” **Process note.**
+- On session open, if the hook shows unpushed commits, surface them before new work — don’t wait for the next close. **Process note** (reinforces existing push-authorization habit).
+
+---
+
 ## 2026-08-31 — PRs, Linux sound, omakase, v1.14.0 release
 
 Triaged open PRs (#5 closed → speculative [#30](https://github.com/marekkowalczyk/breathe-cli/issues/30); #10 superseded by tip port). Recorded macOS-primary / Linux+Windows secondary (community-only). Re-implemented Linux sound from #10 (@kenlacroix); closed #4/#6/#7/#23. Enshrined bare-`breathe` omakase in `CLAUDE.md`/README with DHH/Omacom credit. Filed [#31](https://github.com/marekkowalczyk/breathe-cli/issues/31) (opt-in menu interview). Elevator statement in README. Shipped **v1.14.0** (tag, GitHub Release, PyPI green, Homebrew bump + tap README). Measured at close: 85 tests OK; tip and PATH `breathe` both `1.14.0 2026-08-31T09:29`; VERSION sync OK; tags match; unpushed 0 before this close commit.
