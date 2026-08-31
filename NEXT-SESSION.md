@@ -20,9 +20,9 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 ## Immediate
 
-**Release ready** — tip `1.14.0` smoke-accepted on macOS Tahoe (2026-08-31). Authorize when ready: tag `v1.14.0` + `gh release create` + Homebrew formula bump; then audit [homebrew-breathe](https://github.com/marekkowalczyk/homebrew-breathe) README (may still say macOS-only).
+Nothing blocking. **v1.14.0** released (tag + GitHub Release + PyPI + Homebrew tap bump). Upgrade: `brew upgrade breathe` / `pip install -U breathe-cli`.
 
-Nothing else blocking. Optional next slices: lightest UX **#14**, or homebrew/core **#24** (token) now that #23 leaned (B).
+Optional next slices: lightest UX **#14**, or homebrew/core **#24** (token) now that #23 leaned (B).
 
 ## Carried over
 
