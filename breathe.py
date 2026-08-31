@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Breathe CLI — paced breathing for HFrEF vagal training. macOS only."""
+"""Breathe CLI — paced breathing for HFrEF vagal training.
+
+macOS primary; Linux/Windows secondary (community-maintained).
+"""
 
 import argparse
 import os
@@ -15,10 +18,10 @@ from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
 
-VERSION = '1.13.0'
+VERSION = '1.14.0'
 # Local wall time of this release tip (minute precision). Bump with VERSION —
 # see CLAUDE.md § Versioning.
-RELEASED = '2026-08-30T21:02'
+RELEASED = '2026-08-31T09:29'
 
 # GitHub Pages science explainer (shown under session summary).
 SCIENCE_URL = 'https://marekkowalczyk.github.io/breathe-cli/science/'
@@ -58,6 +61,21 @@ SOUND_INHALE = '/System/Library/Sounds/Tink.aiff'
 SOUND_EXHALE = '/System/Library/Sounds/Pop.aiff'
 AFPLAY       = '/usr/bin/afplay'
 AFPLAY_VOL   = '0.3'
+
+# Linux audio. Players probed in order; the first on PATH wins. Sounds default
+# to the freedesktop theme. Overridable via --sound-player and the
+# BREATHE_SOUND_PLAYER / BREATHE_SOUND_INHALE / BREATHE_SOUND_EXHALE env vars.
+LINUX_PLAYERS = ('paplay', 'pw-play', 'aplay', 'ffplay', 'cvlc')
+LINUX_PLAYER_ARGS = {
+    'ffplay': ('-nodisp', '-autoexit', '-loglevel', 'quiet'),
+    'cvlc': ('--play-and-exit',),
+}
+LINUX_SOUND_DIR    = '/usr/share/sounds/freedesktop/stereo'
+LINUX_SOUND_INHALE = os.path.join(LINUX_SOUND_DIR, 'message.oga')
+LINUX_SOUND_EXHALE = os.path.join(LINUX_SOUND_DIR, 'complete.oga')
+
+# Resolved (player, inhale_path, exhale_path) once check_audio() picks 'linux'.
+_LINUX_AUDIO = None
 
 LOG_FILE   = os.path.expanduser('~/.breathe_log.csv')
 LOG_HEADER = 'date,time,preset,ratio,duration_target_s,duration_actual_s,breaths,completion_pct,status'
@@ -114,6 +132,7 @@ class Config:
     preset_name: str       # 'morning', 'midday', 'evening', 'night', or 'custom'
     sound_enabled: bool
     quiet: bool
+    sound_player: str = None   # Linux player override (--sound-player)
 
     @property
     def ratio_str(self):
@@ -184,12 +203,41 @@ def compute_layout():
 
 # ── Audio subsystem (impure — filesystem, subprocess) ───────────────
 
-def check_audio(quiet):
-    """Init audio subsystem. Returns 'afplay' or 'bell'."""
-    if (os.path.isfile(AFPLAY) and os.access(AFPLAY, os.X_OK)
-            and os.path.isfile(SOUND_INHALE)
-            and os.path.isfile(SOUND_EXHALE)):
-        return 'afplay'
+def resolve_linux_audio(environ, which, override=None):
+    """Resolve (player, inhale_path, exhale_path) for Linux, or None for bell.
+
+    Player comes from override (--sound-player), then BREATHE_SOUND_PLAYER, then
+    the first LINUX_PLAYERS entry on PATH. Sound paths come from
+    BREATHE_SOUND_INHALE / BREATHE_SOUND_EXHALE, else the freedesktop defaults.
+    Returns None (caller falls back to bell) if no player or sound file is found.
+    """
+    player = override or environ.get('BREATHE_SOUND_PLAYER')
+    if player:
+        if not which(player):
+            return None
+    else:
+        player = next((p for p in LINUX_PLAYERS if which(p)), None)
+        if not player:
+            return None
+    inhale = environ.get('BREATHE_SOUND_INHALE', LINUX_SOUND_INHALE)
+    exhale = environ.get('BREATHE_SOUND_EXHALE', LINUX_SOUND_EXHALE)
+    if not (os.path.isfile(inhale) and os.path.isfile(exhale)):
+        return None
+    return (player, inhale, exhale)
+
+def check_audio(quiet, sound_player=None):
+    """Init audio subsystem. Returns 'afplay', 'linux', or 'bell'."""
+    global _LINUX_AUDIO
+    if sys.platform == 'darwin':
+        if (os.path.isfile(AFPLAY) and os.access(AFPLAY, os.X_OK)
+                and os.path.isfile(SOUND_INHALE)
+                and os.path.isfile(SOUND_EXHALE)):
+            return 'afplay'
+    else:
+        resolved = resolve_linux_audio(os.environ, shutil.which, sound_player)
+        if resolved:
+            _LINUX_AUDIO = resolved
+            return 'linux'
     if not quiet:
         sys.stderr.write('audio unavailable: falling back to terminal bell\n')
     return 'bell'
@@ -200,6 +248,20 @@ def play_sound(phase, audio_mode):
         try:
             subprocess.Popen(
                 [AFPLAY, '-v', AFPLAY_VOL, path],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except OSError:
+            pass
+    elif audio_mode == 'linux':
+        if _LINUX_AUDIO is None:
+            return
+        player, inhale, exhale = _LINUX_AUDIO
+        path = inhale if phase == INHALE else exhale
+        extra = LINUX_PLAYER_ARGS.get(os.path.basename(player), ())
+        try:
+            subprocess.Popen(
+                [player, *extra, path],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
@@ -486,7 +548,8 @@ def run_session(config, result):
         result.breaths = int(result.elapsed // cycle_s)
         return
 
-    audio_mode = check_audio(config.quiet) if config.sound_enabled else 'none'
+    audio_mode = (check_audio(config.quiet, config.sound_player)
+                  if config.sound_enabled else 'none')
     layout = compute_layout()
     if layout.minimal and not config.quiet:
         sys.stderr.write('Warning: terminal narrow, running in minimal mode.\n')
@@ -830,6 +893,8 @@ def build_parser():
                         help='Breath ratio as inhale-exhale (e.g. 5-5 or 4-6)')
     parser.add_argument('--no-sound', '-n', action='store_true',
                         help='Disable audio cues')
+    parser.add_argument('--sound-player', metavar='CMD',
+                        help='Linux audio player command (default: auto-detect)')
     parser.add_argument('--quiet', '-q', action='store_true',
                         help='Suppress startup warnings')
     parser.add_argument('--log', action='store_true',
@@ -849,6 +914,7 @@ def main():
     if goal is not None:
         duration_min, inhale_s, exhale_s, preset_name = goal
         no_sound, quiet, no_log = False, False, False
+        sound_player = None
     else:
         parser = build_parser()
         args = parser.parse_args()
@@ -889,6 +955,7 @@ def main():
             duration_min = p['duration_min']
 
         no_sound, quiet, no_log = args.no_sound, args.quiet, args.no_log
+        sound_player = args.sound_player
 
     if not (1 <= duration_min <= 60):
         _die('Duration must be 1\u201360 minutes.')
@@ -905,6 +972,7 @@ def main():
         preset_name=preset_name,
         sound_enabled=not no_sound,
         quiet=quiet,
+        sound_player=sound_player,
     )
 
     result = Result()

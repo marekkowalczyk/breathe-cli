@@ -16,6 +16,9 @@ This document preserves the safety constraints and acceptance tests for
 to keep the non-negotiable safety rationale and the manual test suite in
 one place where they won't be eroded by incremental changes.
 
+macOS is the primary platform. Non-macOS audio and display-wake are
+community-verified best-effort (soft-fail to terminal bell / skip wake).
+
 For implementation constraints, see `CLAUDE.md`.
 
 ## 2. Safety constraints

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Show HN](https://img.shields.io/badge/Show%20HN-discussion-orange)](https://news.ycombinator.com/item?id=48340315)
 
-A terminal app that paces resonance breathing for vagal tone training. macOS only, single file, no dependencies.
+A terminal app that paces resonance breathing for vagal tone training. macOS primary; Linux and Windows secondary (community-maintained). Single file, no dependencies.
 
 ```
 $ breathe
@@ -46,7 +46,8 @@ This app is deliberately constrained. Several common breathing-app features are 
 
 ## Requirements
 
-- macOS (uses `/usr/bin/afplay` for audio cues)
+- **macOS (primary)** — `/usr/bin/afplay` + system sounds (maintainer-tested)
+- **Linux / Windows (secondary)** — community-tested only. The maintainer has no Linux or Windows machines; please report audio/wake bugs with OS + player details
 - Python 3.7+
 
 ## Installation
@@ -67,7 +68,7 @@ Upgrade after a release: `brew upgrade breathe`.
 pip install breathe-cli
 ```
 
-Upgrade after a release: `pip install -U breathe-cli`. Still macOS-only (uses `afplay`).
+Upgrade after a release: `pip install -U breathe-cli`. macOS is primary (`afplay`); Linux/Windows are secondary (see Requirements).
 
 **Not the same project:** unrelated packages reuse similar names on other registries — e.g. the npm [`breathe-cli`](https://www.npmjs.com/package/breathe-cli) and the crates.io [`breathe`](https://crates.io/crates/breathe) crate. This app is Python-only; install via Homebrew or PyPI as above.
 
@@ -156,6 +157,7 @@ Duration: 1–60 minutes (rounded up to complete breath cycles). Ratio: inhale a
 | `--duration MIN`  | `-d`  | Session length in minutes (1–60)           |
 | `--ratio IN-EX`   | `-r`  | Breath ratio, e.g. `5-5` or `4-6`         |
 | `--no-sound`      | `-n`  | Disable audio cues                         |
+| `--sound-player`  |       | Linux audio player command (auto-detected) |
 | `--quiet`         | `-q`  | Suppress startup warnings                  |
 | `--no-log`        |       | Don't log this session                     |
 | `--log`           |       | Print log file path and exit               |
@@ -192,6 +194,24 @@ The status indicator shows `●` during breathing, `‖` when paused, and `🔇`
 The countdown timer tracks completed breathing time only. If you pause for 30 seconds during a 1-minute session, the session takes ~90 seconds of wall-clock time to complete — the timer doesn't advance while paused.
 
 During an interactive session the display stays awake (macOS / Windows / Linux best-effort, no dependencies). Normal dimming and screensaver return when the session ends. If stay-awake cannot be acquired, a calm stderr line appears before the TUI (hidden by `--quiet`) and the summary adds a short Note.
+
+## Linux audio
+
+Linux has no single standard way to play a sound, so Breathe CLI probes for a player and falls back gracefully. **Not smoke-tested by the maintainer** (community-verified only).
+
+1. **Player** — the first of `paplay`, `pw-play`, `aplay`, `ffplay`, `cvlc` found on your `PATH`. Override with `--sound-player CMD` or the `BREATHE_SOUND_PLAYER` env var.
+2. **Sounds** — the freedesktop theme (`/usr/share/sounds/freedesktop/stereo/message.oga` for inhale, `complete.oga` for exhale). Override with `BREATHE_SOUND_INHALE` / `BREATHE_SOUND_EXHALE` (any file your player accepts).
+3. **Fallback** — if no player or sound file is found, Breathe CLI uses the terminal bell, exactly as before.
+
+```bash
+# Use a specific player and custom cues
+BREATHE_SOUND_INHALE=~/sounds/in.wav \
+BREATHE_SOUND_EXHALE=~/sounds/out.wav \
+breathe --sound-player paplay
+```
+
+Most desktop distros ship `paplay` (PulseAudio) or `pw-play` (PipeWire) and the freedesktop sounds, so audio usually works with no configuration.
+
 ## Session logging
 
 Each session appends a row to `~/.breathe_log.csv`:

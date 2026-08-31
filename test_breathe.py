@@ -6,6 +6,7 @@ import os
 import sys
 import unittest
 from contextlib import redirect_stderr
+from unittest import mock
 
 # Import the module under test
 sys.path.insert(0, os.path.dirname(__file__))
@@ -586,6 +587,64 @@ class TestGoalWords(unittest.TestCase):
         with redirect_stderr(buf):
             with self.assertRaises(SystemExit):
                 breathe.try_parse_goal_words(['quick', 'quick'])
+
+
+class TestResolveLinuxAudio(unittest.TestCase):
+    """Linux player/sound resolution — pure logic, filesystem mocked."""
+
+    def _which(self, *available):
+        avail = set(available)
+        return lambda cmd: ('/usr/bin/' + cmd) if cmd in avail else None
+
+    def test_probes_in_order(self):
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio({}, self._which('aplay', 'paplay'))
+        self.assertEqual(r[0], 'paplay')  # earlier in LINUX_PLAYERS wins
+
+    def test_defaults_to_freedesktop_paths(self):
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio({}, self._which('paplay'))
+        self.assertEqual(r, ('paplay',
+                             breathe.LINUX_SOUND_INHALE,
+                             breathe.LINUX_SOUND_EXHALE))
+
+    def test_override_takes_precedence(self):
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio(
+                {'BREATHE_SOUND_PLAYER': 'paplay'},
+                self._which('paplay', 'aplay'),
+                override='aplay')
+        self.assertEqual(r[0], 'aplay')
+
+    def test_env_player_used_when_no_override(self):
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio(
+                {'BREATHE_SOUND_PLAYER': 'aplay'},
+                self._which('paplay', 'aplay'))
+        self.assertEqual(r[0], 'aplay')
+
+    def test_env_sound_paths_used(self):
+        env = {'BREATHE_SOUND_INHALE': '/x/in.wav',
+               'BREATHE_SOUND_EXHALE': '/x/out.wav'}
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio(env, self._which('paplay'))
+        self.assertEqual(r, ('paplay', '/x/in.wav', '/x/out.wav'))
+
+    def test_no_player_returns_none(self):
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio({}, self._which())
+        self.assertIsNone(r)
+
+    def test_unknown_override_returns_none(self):
+        with mock.patch('os.path.isfile', return_value=True):
+            r = breathe.resolve_linux_audio(
+                {}, self._which('paplay'), override='nope')
+        self.assertIsNone(r)
+
+    def test_missing_sound_file_returns_none(self):
+        with mock.patch('os.path.isfile', return_value=False):
+            r = breathe.resolve_linux_audio({}, self._which('paplay'))
+        self.assertIsNone(r)
 
 
 if __name__ == '__main__':
