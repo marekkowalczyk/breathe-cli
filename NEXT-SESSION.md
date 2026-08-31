@@ -20,7 +20,7 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 ## Immediate
 
-**Release pending local smoke** — tip `1.14.0` is on `master`, ahead of tag `v1.13.0`. After you test tip (`python3 breathe.py -v` / short `-d 1`), authorize: tag `v1.14.0` + `gh release create` + Homebrew formula bump; then audit [homebrew-breathe](https://github.com/marekkowalczyk/homebrew-breathe) README (may still say macOS-only).
+**Release ready** — tip `1.14.0` smoke-accepted on macOS Tahoe (2026-08-31). Authorize when ready: tag `v1.14.0` + `gh release create` + Homebrew formula bump; then audit [homebrew-breathe](https://github.com/marekkowalczyk/homebrew-breathe) README (may still say macOS-only).
 
 Nothing else blocking. Optional next slices: lightest UX **#14**, or homebrew/core **#24** (token) now that #23 leaned (B).
 

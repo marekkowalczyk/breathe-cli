@@ -20,6 +20,11 @@ $ breathe
 ```
 
 Footer is dim: key hints on the left, `VERSION · RELEASED` right-aligned (same values as `breathe -v`, without the `breathe` prefix). Narrow terminals drop the stamp before clipping hints.
+
+## Elevator statement
+
+For people who want a reliable daily resonance-breathing habit — including those managing HFrEF / CHF or simply training vagal tone — most breathing apps are either wellness theatre (holds, rapid patterns, gamification) or too fiddly to start. **Breathe CLI** is a single-file terminal pacer: open a shell, run `breathe`, follow the bar at ~6 breaths per minute. You get a clinically shaped, safety-constrained session with almost no setup (omakase defaults by time of day; flags when you care). Unlike phone mindfulness apps or DIY timers, it refuses unsafe patterns, restores the terminal always, and stays install-light (stdlib only, macOS primary).
+
 ## Why this exists
 
 Resonance breathing — slow, paced breathing at around 6 breaths per minute — amplifies respiratory sinus arrhythmia (RSA) and engages cardiac vagal pathways. That matters especially in HFrEF / CHF, where sympathetic overdrive worsens disease; clinical slow-breathing work (e.g. Bernardi) motivates a daily habit tool, not a medical device.
