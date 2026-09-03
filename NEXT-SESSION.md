@@ -14,12 +14,15 @@ Handoff baton for the next cold start — **not** the product backlog.
 
 ## Completed last session
 
-- Filed only (no implementation): [#32](https://github.com/marekkowalczyk/breathe-cli/issues/32) estimated finish clock; [#33](https://github.com/marekkowalczyk/breathe-cli/issues/33) time-bar behind/uneven (likely quantization).
+- Filed only (no implementation): [#34](https://github.com/marekkowalczyk/breathe-cli/issues/34) iPhone app (parked; **AISDLC required** when building — see issue body); [#35](https://github.com/marekkowalczyk/breathe-cli/issues/35) eyes-closed / stronger audio cues (CLI).
+- Pruned roadmap `say` candidate → covered by #35.
 - Prior ship context still current: **v1.14.0** (Linux sound, omakase, elevator statement).
 
 ## Immediate
 
-Nothing blocking. Optional lightest UX: **#14** (bar visibility), **#33** (progress feel / fill policy), or **#32** (finish clock — lean header `~HH:MM`).
+Nothing blocking. Optional lightest CLI UX: **#14** (bar visibility), **#33** (progress feel / fill policy), **#32** (finish clock), or **#35** (eyes-closed audio-first — real product slice, not park-only).
+
+Do **not** start iPhone app code from #34 without AISDLC `intent.md` → `spec.md` → `plan.md` and a human production gate.
 
 ## Carried over
 
@@ -44,6 +47,8 @@ Pointers only:
 - [GH #31](https://github.com/marekkowalczyk/breathe-cli/issues/31) — opt-in menu interview (do not replace omakase)
 - [GH #32](https://github.com/marekkowalczyk/breathe-cli/issues/32) — estimated session finish clock time
 - [GH #33](https://github.com/marekkowalczyk/breathe-cli/issues/33) — time progress bar behind / uneven jumps
+- [GH #34](https://github.com/marekkowalczyk/breathe-cli/issues/34) — idea: iPhone app (AISDLC when building)
+- [GH #35](https://github.com/marekkowalczyk/breathe-cli/issues/35) — eyes-closed mode + stronger audio cues
 
 Community: #8 research, #9 screenshots, #11 Go rewrite Q — unchanged.
 
@@ -60,6 +65,9 @@ Community: #8 research, #9 screenshots, #11 Go rewrite Q — unchanged.
 ## Process notes
 
 - **File-only / don’t implement:** when the user says park or Issues-only, open Issues (or stop) — no code, no design-doc commit, no drive-by fixes.
+- **Process on the Issue:** when the user attaches a build process to a parked idea (e.g. AISDLC on #34), update that Issue body with gates in the same turn — don’t park process only in chat or the wrong repo.
+- **Prune roadmap after filing:** after converting a `ROADMAP-CANDIDATES.md` item to an Issue, prune that candidate the same session/close.
+- **#34 AISDLC:** no iPhone code before accepted `intent.md` → `spec.md` → `plan.md`; human production gate; safety envelope in `CLAUDE.md`/skills/hooks. Playbook: https://academy.claude.com/courses/ai-native-sdlc-playbook
 - **Unpushed at open:** if the SessionStart hook shows unpushed commits, surface them before starting new work.
 - **Owner platform intent:** if the user says they want Linux (or another platform) support, update constitution and schedule/ship the work in that thread — do not leave the only public signal as “blocked on homebrew/core.”
 - **Numbered session openers:** finish or Issue-park each item before moving on; no overnight “draft later” leftovers.

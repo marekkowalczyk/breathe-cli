@@ -2,6 +2,24 @@
 
 Continuous improvement log. Each session ends with a brief review: what went well, what didn't, what to change. This is the POOGI (Process Of Ongoing Improvement) record for this project.
 
+## 2026-09-03 — iPhone + eyes-closed Issues; AISDLC on #34
+
+Filed [#34](https://github.com/marekkowalczyk/breathe-cli/issues/34) (native iPhone app, parked) and [#35](https://github.com/marekkowalczyk/breathe-cli/issues/35) (CLI eyes-closed / stronger audio cues). User then required [AISDLC](https://academy.claude.com/courses/ai-native-sdlc-playbook) for building the app — encoded as process on #34 (intent → spec → plan → evals → human production gate). Pruned the roadmap `say` candidate into #35’s “already covered” table. No product code. Measured at close: 85 tests OK; tip `1.14.0 2026-08-31T09:29`; VERSION sync OK; nothing to release; unpushed 0 before this close commit.
+
+**What went well:**
+- **File-only held** — Issues + issue-body process edit only; no Xcode scaffold, no CLI flag work.
+- **One concern each** — iPhone (#34) separate from desktop GUI (#22); eyes-closed CLI (#35) separate from night audio/dim (#17/#18).
+- **Process constraint landed on the Issue** — AISDLC rules live where the next agent will open the ticket, not only in chat.
+
+**What didn't go well:**
+- Nothing material; short park session. (No user correction.)
+
+**What we'll do differently:**
+- When the user attaches a build process (e.g. AISDLC) to a parked product idea: update that Issue’s body with stage table + hard gates in the same turn — do not invent a parallel doc in the wrong repo. **Process note.**
+- After filing a roadmap candidate as an Issue: prune `ROADMAP-CANDIDATES.md` in the same session (or the close) so the park file does not re-suggest already-filed work. **Process note** (reinforces existing “delete or prune after filing”).
+
+---
+
 ## 2026-08-31 (PM) — Finish-clock + progress-bar issues only
 
 Diagnosed session time-bar “behind / uneven” as likely `round()` + coarse `BAR_WIDTH` quantization (not countdown drift); brainstormed estimated finish clock time. **User correction:** file Issues only — do not implement. Filed [#32](https://github.com/marekkowalczyk/breathe-cli/issues/32) (finish clock) and [#33](https://github.com/marekkowalczyk/breathe-cli/issues/33) (progress feel). No product code. Measured at close: 85 tests OK; tip `1.14.0 2026-08-31T09:29`; VERSION sync OK; nothing to release; prior close commit had been sitting unpushed.
