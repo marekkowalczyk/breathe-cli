@@ -647,5 +647,16 @@ class TestResolveLinuxAudio(unittest.TestCase):
         self.assertIsNone(r)
 
 
+class TestNoTermiosFallback(unittest.TestCase):
+    def test_setup_raw_tty_without_termios_returns_none(self):
+        with mock.patch.object(breathe, 'termios', None):
+            self.assertIsNone(breathe.setup_raw_tty())
+
+    def test_restore_tty_without_termios_never_raises(self):
+        with mock.patch.object(breathe, 'termios', None):
+            breathe.restore_tty(None)
+            breathe.restore_tty(object())
+
+
 if __name__ == '__main__':
     unittest.main()
