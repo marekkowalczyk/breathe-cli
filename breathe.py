@@ -11,9 +11,17 @@ import signal
 import shutil
 import subprocess
 import sys
-import termios
 import time
-import tty
+try:
+    import tty
+except ImportError:
+    # Windows has no POSIX TTY module (it re-exports termios).
+    tty = None
+try:
+    import termios
+except ImportError:
+    # Windows has no POSIX terminal control; raw-mode helpers below no-op.
+    termios = None
 from dataclasses import dataclass
 
 # ── Constants ────────────────────────────────────────────────────────
@@ -356,6 +364,8 @@ def release_display_wake(handle):
 # ── Terminal raw-mode / key polling (impure) ────────────────────────
 
 def setup_raw_tty():
+    if termios is None or tty is None:
+        return None
     if not sys.stdin.isatty():
         return None
     try:
@@ -366,11 +376,12 @@ def setup_raw_tty():
         return None
 
 def restore_tty(old_settings):
-    if old_settings is not None:
-        try:
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
-        except termios.error:
-            pass
+    if old_settings is None or termios is None:
+        return
+    try:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+    except termios.error:
+        pass
 
 def poll_key():
     if not sys.stdin.isatty():
